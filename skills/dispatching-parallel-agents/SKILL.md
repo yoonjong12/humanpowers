@@ -180,3 +180,15 @@ From debugging session (2025-10-03):
 - All investigations completed concurrently
 - All fixes integrated successfully
 - Zero conflicts between agent changes
+
+## humanpowers TF-aware Parallel Dispatch
+
+When dispatching parallel agents in humanpowers context:
+
+1. Read `tfs.md`. Build dependency graph from `depends_on`.
+2. Find frontier — TFs whose `depends_on` is all `status: verified`.
+3. Dispatch one subagent per frontier TF (parallel) — pass `TF-id` and ensure context fork.
+4. Wait for all to complete (each returns updated tfs.md status).
+5. Re-compute frontier. Repeat until all TFs verified.
+
+**Anti-pattern**: dispatching by domain (e.g., "FE agent"). humanpowers has no domain teams. Always dispatch by TF.
