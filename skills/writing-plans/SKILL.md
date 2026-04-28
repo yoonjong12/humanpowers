@@ -174,20 +174,32 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After saving the per-TF plan, run boss confirm gate, then route to humanpowers:operate.
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
+**"Plan complete and saved to `~/humanpowers/{project-name}/tfs/{TF-id}/build-plan.md`.**
 
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
+**Pre-build gate (REQUIRED):** Boss confirms TF spec + expected-outputs are signed_off in `tfs.md`. If not signed_off → abort, re-run humanpowers:quiz for this TF.
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+**Build path options (after gate passes):**
+
+**1. Subagent-Driven (recommended)** — Fresh subagent per task, two-stage review between tasks, fast iteration.
+
+**2. Inline Execution** — Tasks in this session, checkpoint after each.
+
+**3. Parallel TF-fanout** — When multiple TFs have `depends_on: []` and are independent, dispatch in parallel.
 
 **Which approach?"**
 
 **If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use humanpowers:subagent-driven-development
-- Fresh subagent per task + two-stage review
+- **REQUIRED SUB-SKILL:** humanpowers:subagent-driven-development
+- After all tasks complete → humanpowers:verification-before-completion (post-build gate, boss demo signoff).
 
 **If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use humanpowers:executing-plans
-- Batch execution with checkpoints for review
+- **REQUIRED SUB-SKILL:** humanpowers:operate (drives TF lifecycle: build → verify → mark `status: built`).
+- After all tasks complete → humanpowers:verification-before-completion.
+
+**If Parallel TF-fanout chosen:**
+- **REQUIRED SUB-SKILL:** humanpowers:dispatching-parallel-agents.
+- Each parallel branch must independently pass humanpowers:verification-before-completion before its TF is marked `status: verified`.
+
+**Terminal state:** humanpowers:verification-before-completion. NO code-pass-only completion. Boss demo signoff required.
