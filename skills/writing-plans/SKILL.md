@@ -50,7 +50,7 @@ This structure informs the task decomposition. Each task should produce self-con
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use humanpowers:subagent-driven-development (recommended) or humanpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use humanpowers:subagent-driven-development (recommended) or humanpowers:operate to drive this TF plan task-by-task. Each TF gates pre-build (boss confirm) + post-build (humanpowers:verification-before-completion). Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
