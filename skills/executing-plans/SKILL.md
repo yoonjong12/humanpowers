@@ -36,6 +36,21 @@ After all tasks complete and verified:
 - **REQUIRED SUB-SKILL:** Use humanpowers:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
 
+## humanpowers Checkpoints
+
+After each TF Task completes, agent MUST:
+
+1. Update `tfs/{TF-id}/build-plan.md` task checkbox to `[x]`.
+2. Update `tfs.md` row status if appropriate.
+3. **Optional boss demo**: If task is "user-visible" (creates UI element / API endpoint / data), offer boss a mini-demo. Boss can skip.
+4. After ALL tasks in a TF complete, INVOKE humanpowers:verification-before-completion → mandatory boss demo signoff.
+
+Skipping mandatory signoff = TF stays at `status: built`, NOT `verified`.
+
+## Terminal state
+
+After all tasks in a TF complete: invoke humanpowers:verification-before-completion. Do NOT mark TF verified independently.
+
 ## When to Stop and Ask for Help
 
 **STOP executing immediately when:**
