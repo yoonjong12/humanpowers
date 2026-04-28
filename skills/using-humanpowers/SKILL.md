@@ -1,7 +1,13 @@
 ---
-name: using-superpowers
-description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+name: using-humanpowers
+description: Use when starting any conversation in a humanpowers project — establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
 ---
+
+## humanpowers identity
+
+This is a fork of superpowers' `using-superpowers` skill, rebranded for humanpowers (boss-articulation enforcement). Behavior is similar but skills load humanpowers-namespace, not superpowers.
+
+When in doubt, prefer **humanpowers** skills inside humanpowers projects (workspace at `~/humanpowers/{project}/`). Outside humanpowers projects, original superpowers may still be available.
 
 <SUBAGENT-STOP>
 If you were dispatched as a subagent to execute a specific task, skip this skill.
