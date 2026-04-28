@@ -3,6 +3,15 @@ name: writing-skills
 description: Use when creating new skills, editing existing skills, or verifying skills work before deployment
 ---
 
+## humanpowers identity
+
+When creating new skills FOR humanpowers projects, follow these conventions:
+
+1. Skill name lowercase, no `humanpowers-` prefix needed (plugin namespace handled by manifest)
+2. Description should reference humanpowers context if applicable (e.g., "Use after humanpowers:brainstorming when...")
+3. For TF-related skills, take `TF-id` as primary input
+4. Always reference workspace path `~/humanpowers/{project}/...`
+
 # Writing Skills
 
 ## Overview
