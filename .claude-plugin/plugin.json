@@ -1,8 +1,11 @@
 {
   "name": "humanpowers",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Boss-articulation enforcement plugin. Forces lazy boss into design/quiz/verification dialogue. Forked from superpowers with TF model + matrix views + Quiz module.",
-  "author": "yoonjong12",
+  "author": {
+    "name": "yoonjong12",
+    "url": "https://github.com/yoonjong12"
+  },
   "homepage": "https://github.com/yoonjong12/humanpowers",
   "license": "MIT"
 }
