@@ -15,8 +15,9 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
-- (User preferences for plan location override this default)
+**Save plans to:** `~/humanpowers/{project-name}/tfs/{TF-id}/build-plan.md`
+
+One plan file per TF. Cross-TF coordination via `threads/*.md`.
 
 ## Scope Check
 
@@ -102,6 +103,46 @@ git add tests/path/test.py src/path/file.py
 git commit -m "feat: add specific feature"
 ```
 ````
+
+## TF-unit Plan Structure (humanpowers extension)
+
+In humanpowers, plans are organized by TF (Task Force), not by linear phases.
+
+Each TF gets its own plan section:
+
+  ```markdown
+  ## TF-1a: 검색 UI (action_type: ui)
+
+  **Spec source**: `tfs.md#TF-1a`
+  **VERIFY (signed_off)**: `tfs/TF-1a/expected-outputs.md`
+  **depends_on**: []
+  **Boss confirm gate**: REQUIRED before Task 1 of this TF begins.
+
+  ### Task 1: ...
+  ### Task 2: ...
+  ```
+
+After all tasks for a TF complete, mark `status: built` in `tfs.md`. Run humanpowers:verification-before-completion before next TF.
+
+### Boss Confirm Gates (humanpowers principle)
+
+Each TF plan MUST have:
+
+1. **Pre-build gate**: Boss confirms TF spec + expected-outputs are signed_off. If not, abort and re-run quiz.
+2. **Mid-build checkpoints**: After each Task in TF, boss has option to inspect (not required, but available).
+3. **Post-build gate**: Run humanpowers:verification-before-completion → boss demo signoff. NO code-pass-only completion.
+
+Gates are explicit. AI does NOT proceed past gate without boss action.
+
+## Build Order from depends_on
+
+Read `tfs.md`. Compute topological order from `depends_on` field:
+
+1. TFs with `depends_on: []` → can start immediately, parallel-eligible.
+2. TFs with deps → wait until all deps `status: verified`.
+3. Cycle in deps = abort, ask boss to break cycle.
+
+Use humanpowers:dispatching-parallel-agents for parallel-eligible TFs.
 
 ## No Placeholders
 
