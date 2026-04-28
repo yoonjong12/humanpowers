@@ -1,0 +1,13 @@
+{
+  "name": "humanpowers-marketplace",
+  "owner": {
+    "name": "yoonjong12"
+  },
+  "plugins": [
+    {
+      "name": "humanpowers",
+      "source": "./",
+      "description": "Boss-articulation enforcement plugin. Forces lazy boss into design/quiz/verification dialogue. Forked from superpowers with TF model + matrix views + Quiz module."
+    }
+  ]
+}
