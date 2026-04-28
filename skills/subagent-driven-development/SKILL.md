@@ -275,3 +275,17 @@ Done!
 
 **Alternative workflow:**
 - **humanpowers:executing-plans** - Use for parallel session instead of same-session execution
+
+## humanpowers TF Lead Pattern
+
+In humanpowers, subagents play the role of TF Lead — ad-hoc per TF, no fixed domain identity.
+
+**Dispatch convention**:
+- Pass `TF-id` as primary context
+- Subagent reads: `tfs.md#TF-{id}`, `tfs/{id}/expected-outputs.md`, `tfs/{id}/build-plan.md`
+- Subagent acts within scope of that TF only
+- Same human/agent can lead different TFs (no role attachment)
+
+**Memory**:
+- Per-TF scratchpad at `library/scratchpads/TF-{id}.md` (≤30 lines, auto-truncated by hook)
+- NOT in `~/.claude/projects/.../memory/` (that's claude-code's per-project memory)
