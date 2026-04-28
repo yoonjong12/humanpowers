@@ -18,7 +18,7 @@ writing-plans (TF-unit build plans)
   ↓
 test-driven-development (uses expected-outputs.md as test spec)
   ↓
-executing-plans (build)
+operate per TF (or executing-plans for batch)
   ↓
 verification-before-completion (boss demo signoff)
 ```

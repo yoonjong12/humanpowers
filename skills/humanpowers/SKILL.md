@@ -1,6 +1,6 @@
 ---
 name: humanpowers
-description: Single entry point for humanpowers projects. Auto-detects current phase from .humanpowers/state.json and routes to brainstorming / quiz / writing-plans / executing-plans / verification / review / finishing. Boss types `/humanpowers` and dispatcher figures out next step. Use this when boss says "I want to start" or "continue" or just types /humanpowers.
+description: Single entry point for humanpowers projects. Auto-detects current phase from .humanpowers/state.json and routes to brainstorming / quiz / writing-plans / operate (or executing-plans) / verification / review / finishing. Boss types `/humanpowers` and dispatcher figures out next step. Use this when boss says "I want to start" or "continue" or just types /humanpowers.
 ---
 
 # humanpowers Dispatcher
@@ -64,7 +64,7 @@ TFs: {VERIFIED}/{TOTAL} verified, {BUILT}/{TOTAL} built, {QUIZ_DONE}/{TOTAL} qui
 | `brainstorm` | humanpowers:brainstorming |
 | `brainstorm-done` | humanpowers:quiz |
 | `quiz-done` | humanpowers:writing-plans |
-| `designed` | humanpowers:executing-plans (or operate per TF) |
+| `designed` | humanpowers:operate per TF (or humanpowers:executing-plans for batch) |
 | `built` | humanpowers:verification-before-completion |
 | `verified` (some) | humanpowers:review or continue per TF |
 | `verified` (all) | humanpowers:finishing-a-development-branch |
