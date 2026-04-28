@@ -1,0 +1,6 @@
+.DS_Store
+.humanpowers/state.json
+.humanpowers/invocation-log.jsonl
+node_modules/
+*.swp
+*.swo
