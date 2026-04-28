@@ -190,6 +190,38 @@ git worktree remove <worktree-path>
 - Get typed confirmation for Option 4
 - Clean up worktree for Options 1 & 4 only
 
+## humanpowers final acceptance
+
+Before merge/PR/cleanup:
+
+1. Verify ALL TFs in `tfs.md` have `status: verified`. If any not verified, halt.
+2. Run `scripts/render-views.sh` — final views/*.md updated.
+3. Show boss the `views/progress.md` matrix — all checkboxes filled.
+4. Boss explicit signoff via AskUserQuestion:
+   - "All TFs verified. Ready to finalize? PASS / HOLD / ABORT"
+5. PASS → bump `boss.md` version (e.g., v1.0 → v1.1 minor or v2.0 major if pivot occurred).
+6. Commit + tag git.
+
+## boss.md Version bump rules
+
+Locate `boss.md` header `version: vX.Y`.
+
+- **Minor (X.Y → X.Y+1)**: TF additions, non-structural edits, NFR additions.
+- **Major (X.Y → X+1.0)**: Matrix structure pivot (e.g., concern/action_type changes), TF removal, persona change.
+
+Edit `boss.md` first line:
+
+```yaml
+version: v1.1 (2026-04-28, added TF-3d image search)
+```
+
+Commit:
+
+```bash
+git commit -m "release: humanpowers project v1.1 - TF-3d added"
+git tag v1.1
+```
+
 ## Integration
 
 **Called by:**
