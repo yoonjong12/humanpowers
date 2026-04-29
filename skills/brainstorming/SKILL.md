@@ -54,11 +54,11 @@ You MUST create a task for each of these items and complete them in order:
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **TF extraction** — decompose design into TF atomic units; capture 5 fields per TF
+6. **Task extraction** — decompose design into task atomic units; capture 5 fields per task
 7. **Write workspace outputs** — `problem.md` under `<workspace>/.humanpowers/` and commit
 8. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-9. **User reviews TF + problem.md** — ask user to review before proceeding
-10. **Transition to quiz** — invoke humanpowers:quiz skill to articulate expected outputs per TF
+9. **User reviews tasks + problem.md** — ask user to review before proceeding
+10. **Transition to quiz** — invoke humanpowers:quiz skill to articulate expected outputs per task
 
 ## Process Flow
 
@@ -71,10 +71,10 @@ digraph brainstorming {
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
-    "TF extraction\n(per-TF, one at a time)" [shape=box];
+    "Task extraction\n(per-task, one at a time)" [shape=box];
     "Write workspace outputs\n(problem.md)" [shape=box];
     "Spec self-review\n(fix inline)" [shape=box];
-    "User reviews TF + problem.md?" [shape=diamond];
+    "User reviews tasks + problem.md?" [shape=diamond];
     "Invoke humanpowers:quiz skill" [shape=doublecircle];
 
     "Explore project context" -> "Visual questions ahead?";
@@ -85,16 +85,16 @@ digraph brainstorming {
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "TF extraction\n(per-TF, one at a time)" [label="yes"];
-    "TF extraction\n(per-TF, one at a time)" -> "Write workspace outputs\n(problem.md)";
+    "User approves design?" -> "Task extraction\n(per-task, one at a time)" [label="yes"];
+    "Task extraction\n(per-task, one at a time)" -> "Write workspace outputs\n(problem.md)";
     "Write workspace outputs\n(problem.md)" -> "Spec self-review\n(fix inline)";
-    "Spec self-review\n(fix inline)" -> "User reviews TF + problem.md?";
-    "User reviews TF + problem.md?" -> "TF extraction\n(per-TF, one at a time)" [label="changes requested"];
-    "User reviews TF + problem.md?" -> "Invoke humanpowers:quiz skill" [label="approved"];
+    "Spec self-review\n(fix inline)" -> "User reviews tasks + problem.md?";
+    "User reviews tasks + problem.md?" -> "Task extraction\n(per-task, one at a time)" [label="changes requested"];
+    "User reviews tasks + problem.md?" -> "Invoke humanpowers:quiz skill" [label="approved"];
 }
 ```
 
-**The terminal state is invoking humanpowers:quiz.** Do NOT invoke writing-plans, frontend-design, mcp-builder, or any other implementation skill. Quiz forces the developer to articulate expected outputs per TF before any implementation plan.
+**The terminal state is invoking humanpowers:quiz.** Do NOT invoke writing-plans, frontend-design, mcp-builder, or any other implementation skill. Quiz forces the developer to articulate expected outputs per task before any implementation plan.
 
 ## The Process
 
@@ -135,14 +135,14 @@ digraph brainstorming {
 - Where existing code has problems that affect the work (e.g., a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.
 - Don't propose unrelated refactoring. Stay focused on what serves the current goal.
 
-## Step N+1: TF Extraction
+## Step N+1: Task Extraction
 
-After design lock, decompose into TF (Task Force) atomic units.
+After design lock, decompose into task atomic units.
 
-For each TF, capture 5 fields + metadata:
+For each task, capture 5 fields + metadata:
 
   ```yaml
-  - id: TF-1a
+  - id: 1a
     name: short descriptive name
     concern: developer-level scenario this serves
     action_type: ui | api | data | infra | cross-cutting
@@ -152,14 +152,14 @@ For each TF, capture 5 fields + metadata:
     verify_form: gherkin | curl | sql | checklist | composite  # matches action_type
     nfr_local:
       - row-local NFR (e.g., "<500ms response")
-    depends_on: []  # TF-ids this blocks on
+    depends_on: []  # task ids this blocks on
     status: brainstorm-done
     mode: independent | facilitating | collaboration
   ```
 
-Developer confirms each TF. Disagreements = revise spec, not skip.
+Developer confirms each task. Disagreements = revise spec, not skip.
 
-Ask developer one TF at a time.
+Ask developer one task at a time.
 
 ### VERIFY form by action_type
 
@@ -169,21 +169,21 @@ Ask developer one TF at a time.
 | api | cURL + expected JSON / OpenAPI example | `curl -X POST /api/x -d '{...}'` → `{status: 200, body: {...}}` |
 | data | SQL assertion + sample row | `SELECT count(*) FROM x WHERE y = 'z'` → expect ≥1 |
 | infra | Checklist + health curl | `[x] env SET / [x] curl /health → 200` |
-| cross-cutting | Composite (all impacted TF VERIFY pass) | No standalone test |
+| cross-cutting | Composite (all impacted task VERIFY pass) | No standalone test |
 
 Use this table when prompting developer for VERIFY content.
 
 ## NFR (Non-Functional Requirements) — 2 layers
 
-**Layer 0 (Project invariants)** — `problem.md` section. Default 4 categories:
+**Project invariants** — `problem.md` section. Default 4 categories:
 - Security
 - Data integrity
 - Determinism
 - Compliance
 
-**Layer 1 (TF-local NFR)** — Per TF in `tfs.md`. Specific to one TF.
+**task-local NFR** — Per task in `tasks.md`. Specific to one task.
 
-**Promotion rule**: When same NFR appears in **2+ TFs**, agent posts to `threads/promote-{nfr}.md`. Developer confirms = move to Layer 0.
+**Promotion rule**: When same NFR appears in **2+ tasks**, agent posts to `threads/promote-{nfr}.md`. Developer confirms = move to Project invariants.
 
 ## Step N+2: Output to humanpowers workspace
 
@@ -201,7 +201,7 @@ Next phase = `quiz`.
 
 ## Step N+3: Hand off to quiz
 
-Terminal state of brainstorming: invoke humanpowers:quiz skill (NOT writing-plans). Quiz module forces the developer to articulate expected outputs per TF before any implementation plan.
+Terminal state of brainstorming: invoke humanpowers:quiz skill (NOT writing-plans). Quiz module forces the developer to articulate expected outputs per task before any implementation plan.
 
 ## Documentation
 
@@ -226,7 +226,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 **Quiz handoff:**
 
-- Invoke the humanpowers:quiz skill to force developer articulation of expected outputs per TF
+- Invoke the humanpowers:quiz skill to force developer articulation of expected outputs per task
 - Do NOT invoke writing-plans or any other implementation skill. humanpowers:quiz is the next step.
 
 ## Key Principles
