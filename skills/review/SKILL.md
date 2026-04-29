@@ -1,6 +1,6 @@
 ---
 name: review
-description: Use after multiple TFs are verified to perform boss review of the project state, optionally bump boss.md version, and identify next priorities. Distinct from per-TF verification (which is humanpowers:verification-before-completion). This is project-level review with cascade decisions.
+description: Use after multiple TFs are verified to perform developer review of the project state, optionally bump developer.md version, and identify next priorities. Distinct from per-TF verification (which is humanpowers:verification-before-completion). This is project-level review with cascade decisions.
 ---
 
 # Review Skill
@@ -8,7 +8,7 @@ description: Use after multiple TFs are verified to perform boss review of the p
 ## When to invoke
 
 - After at least 2 TFs reach `status: verified`
-- Or boss explicitly requests `/humanpowers review`
+- Or developer explicitly requests `/humanpowers review`
 - Before finishing-a-development-branch (final wrap)
 
 ## Steps
@@ -19,18 +19,18 @@ Run `scripts/render-views.sh` to ensure views/*.md current.
 
 Read:
 - `views/progress.md` — status overview
-- `boss.md` — invariants + version
+- `developer.md` — invariants + version
 - All `threads/*.md` — open vs resolved
 
-### Step 2: Show boss the review summary
+### Step 2: Show developer the review summary
 
 Display:
 ```
 Project: {name}
-Version: {boss.md version}
+Version: {developer.md version}
 
 TFs: {N total}
-  brainstorm-done: {x}
+  problem-defined: {x}
   quiz-done: {x}
   designed: {x}
   built: {x}
@@ -50,9 +50,9 @@ Pull invariant violations by scanning recent commits + tfs.md changes.
 Q: 프로젝트 review 결과. 다음 액션?
 options:
   - 1. 다음 TF 우선순위 결정 (continue building)
-  - 2. boss.md version bump (minor/major)
+  - 2. developer.md version bump (minor/major)
   - 3. Cascade — 특정 TF expected-outputs 재검토 (re-quiz)
-  - 4. Open threads 처리 (boss reviews threads)
+  - 4. Open threads 처리 (developer reviews threads)
   - 5. Finalize (humanpowers:finishing-a-development-branch)
 ```
 
@@ -78,7 +78,7 @@ options:
   - major (X.Y → X+1.0) — 매트릭스 구조 pivot / TF 제거
 ```
 
-Edit boss.md frontmatter version. Commit + tag git.
+Edit developer.md frontmatter version. Commit + tag git.
 
 ### Step 4c: Option 3 — Cascade re-quiz
 
@@ -88,7 +88,7 @@ Q: 어느 TF 의 expected-outputs 재검토?
 free text: TF-id
 ```
 
-Reset that TF's `status: brainstorm-done`. Hand off to humanpowers:quiz.
+Reset that TF's `status: problem-defined`. Hand off to humanpowers:quiz.
 
 ### Step 4d: Option 4 — Threads
 
@@ -108,6 +108,6 @@ Set `last_review` timestamp. Persist any chosen next phase.
 
 ## Boundaries
 
-- Don't auto-bump version — boss must choose
-- Don't auto-close threads — boss must mark
+- Don't auto-bump version — developer must choose
+- Don't auto-close threads — developer must mark
 - Don't cascade re-quiz on multiple TFs at once — one at a time

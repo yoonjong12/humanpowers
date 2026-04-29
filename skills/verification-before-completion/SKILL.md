@@ -14,7 +14,7 @@ VERIFY = signed_off `tfs/{TF-id}/expected-outputs.md` from quiz phase.
 
 ## Demo form by action_type
 
-| action_type | Demo form for boss |
+| action_type | Demo form for developer |
 |-------------|-------------------|
 | ui | Live click-through following Gherkin scenarios. Boss watches screen, confirms each Then clause. |
 | api | Live cURL execution with response shown. Boss confirms HTTP code + body shape. |
@@ -27,8 +27,8 @@ Boss WATCHES the demo (or operates it themselves). Agent does NOT run demo silen
 ## Signoff process
 
 1. Agent prepares demo per `expected-outputs.md` Q list.
-2. Agent runs demo with boss watching (or boss runs).
-3. For each Q, boss says: PASS / FAIL / NEEDS REWORK.
+2. Agent runs demo with developer watching (or developer runs).
+3. For each Q, developer says: PASS / FAIL / NEEDS REWORK.
 4. All Q = PASS → mark TF `status: verified` in `tfs.md`.
 5. Any FAIL → halt, return to writing-plans for re-build.
 6. NEEDS REWORK → return to quiz to re-articulate that Q.

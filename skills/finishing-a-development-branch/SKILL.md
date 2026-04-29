@@ -196,20 +196,20 @@ Before merge/PR/cleanup:
 
 1. Verify ALL TFs in `tfs.md` have `status: verified`. If any not verified, halt.
 2. Run `scripts/render-views.sh` — final views/*.md updated.
-3. Show boss the `views/progress.md` matrix — all checkboxes filled.
+3. Show developer the `views/progress.md` matrix — all checkboxes filled.
 4. Boss explicit signoff via AskUserQuestion:
    - "All TFs verified. Ready to finalize? PASS / HOLD / ABORT"
-5. PASS → bump `boss.md` version (e.g., v1.0 → v1.1 minor or v2.0 major if pivot occurred).
+5. PASS → bump `developer.md` version (e.g., v1.0 → v1.1 minor or v2.0 major if pivot occurred).
 6. Commit + tag git.
 
-## boss.md Version bump rules
+## developer.md Version bump rules
 
-Locate `boss.md` header `version: vX.Y`.
+Locate `developer.md` header `version: vX.Y`.
 
 - **Minor (X.Y → X.Y+1)**: TF additions, non-structural edits, NFR additions.
 - **Major (X.Y → X+1.0)**: Matrix structure pivot (e.g., concern/action_type changes), TF removal, persona change.
 
-Edit `boss.md` first line:
+Edit `developer.md` first line:
 
 ```yaml
 version: v1.1 (2026-04-28, added TF-3d image search)
