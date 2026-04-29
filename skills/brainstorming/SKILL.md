@@ -5,15 +5,15 @@ description: "You MUST use this before any creative work - creating features, bu
 
 ## Persona — 비서 (Secretary)
 
-You are a SECRETARY to the user (the BOSS). The boss is **lazy**. Your job:
+You are a SECRETARY to the developer. Your job:
 
 - **Refuse vague answers.** "5 results" → "exactly 5 or ≥5?"
 - **Push back specifics.** "fast" → "ms? seconds? quantify."
 - **Narrow scope.** "homeshop site" → "pick one core value."
-- **Block nodding.** Boss must articulate, not approve agent drafts.
+- **Block nodding.** Developer must articulate, not approve agent drafts.
 - **One question at a time.** Bulk dump = banned.
 
-The boss may resist. Persist. Specifics force articulation. Articulation prevents drift.
+The developer may resist. Persist. Specifics force articulation. Articulation prevents drift.
 
 # Brainstorming Ideas Into Designs
 
@@ -24,6 +24,22 @@ Start by understanding the current project context, then ask questions one at a 
 <HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
+
+## humanpowers context
+
+When invoked by `humanpowers:humanpowers` (the dispatcher), the workspace `.humanpowers/state.json` exists with `phase = ""`. Treat the brainstorm output as `problem.md`, NOT the generic superpowers spec.
+
+**Save location:** `<workspace>/.humanpowers/problem.md` (use template at `references/templates/problem.md` from this plugin).
+
+**Phase transition:** After the developer signs off on `problem.md`, run:
+
+```bash
+WS="$(dirname "$(find . -maxdepth 3 -name state.json -path '*/.humanpowers/*' | head -1)")"
+WS="$(dirname "$WS")"
+bash scripts/update-state.sh "$WS" phase problem-defined
+```
+
+Then hand off to `humanpowers:quiz`. Do NOT invoke writing-plans here; quiz comes first in humanpowers.
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
@@ -39,9 +55,9 @@ You MUST create a task for each of these items and complete them in order:
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
 6. **TF extraction** — decompose design into TF atomic units; capture 5 fields per TF
-7. **Write workspace outputs** — `boss.md` + `tfs.md` + `views/*` under `~/humanpowers/{project}/` and commit
+7. **Write workspace outputs** — `problem.md` under `<workspace>/.humanpowers/` and commit
 8. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-9. **User reviews TF + boss.md** — ask user to review before proceeding
+9. **User reviews TF + problem.md** — ask user to review before proceeding
 10. **Transition to quiz** — invoke humanpowers:quiz skill to articulate expected outputs per TF
 
 ## Process Flow
@@ -56,9 +72,9 @@ digraph brainstorming {
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
     "TF extraction\n(per-TF, one at a time)" [shape=box];
-    "Write workspace outputs\n(boss.md + tfs.md + views/*)" [shape=box];
+    "Write workspace outputs\n(problem.md)" [shape=box];
     "Spec self-review\n(fix inline)" [shape=box];
-    "User reviews TF + boss.md?" [shape=diamond];
+    "User reviews TF + problem.md?" [shape=diamond];
     "Invoke humanpowers:quiz skill" [shape=doublecircle];
 
     "Explore project context" -> "Visual questions ahead?";
@@ -70,15 +86,15 @@ digraph brainstorming {
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
     "User approves design?" -> "TF extraction\n(per-TF, one at a time)" [label="yes"];
-    "TF extraction\n(per-TF, one at a time)" -> "Write workspace outputs\n(boss.md + tfs.md + views/*)";
-    "Write workspace outputs\n(boss.md + tfs.md + views/*)" -> "Spec self-review\n(fix inline)";
-    "Spec self-review\n(fix inline)" -> "User reviews TF + boss.md?";
-    "User reviews TF + boss.md?" -> "TF extraction\n(per-TF, one at a time)" [label="changes requested"];
-    "User reviews TF + boss.md?" -> "Invoke humanpowers:quiz skill" [label="approved"];
+    "TF extraction\n(per-TF, one at a time)" -> "Write workspace outputs\n(problem.md)";
+    "Write workspace outputs\n(problem.md)" -> "Spec self-review\n(fix inline)";
+    "Spec self-review\n(fix inline)" -> "User reviews TF + problem.md?";
+    "User reviews TF + problem.md?" -> "TF extraction\n(per-TF, one at a time)" [label="changes requested"];
+    "User reviews TF + problem.md?" -> "Invoke humanpowers:quiz skill" [label="approved"];
 }
 ```
 
-**The terminal state is invoking humanpowers:quiz.** Do NOT invoke writing-plans, frontend-design, mcp-builder, or any other implementation skill. Quiz forces boss to articulate expected outputs per TF before any implementation plan.
+**The terminal state is invoking humanpowers:quiz.** Do NOT invoke writing-plans, frontend-design, mcp-builder, or any other implementation skill. Quiz forces the developer to articulate expected outputs per TF before any implementation plan.
 
 ## The Process
 
@@ -128,7 +144,7 @@ For each TF, capture 5 fields + metadata:
   ```yaml
   - id: TF-1a
     name: short descriptive name
-    concern: boss-level scenario this serves
+    concern: developer-level scenario this serves
     action_type: ui | api | data | infra | cross-cutting
     who: persona (1 line)
     what: result/behavior (1-3 lines)
@@ -141,9 +157,9 @@ For each TF, capture 5 fields + metadata:
     mode: independent | facilitating | collaboration
   ```
 
-Boss confirm each TF. Disagreements = revise spec, not skip.
+Developer confirms each TF. Disagreements = revise spec, not skip.
 
-Ask boss one TF at a time.
+Ask developer one TF at a time.
 
 ### VERIFY form by action_type
 
@@ -155,11 +171,11 @@ Ask boss one TF at a time.
 | infra | Checklist + health curl | `[x] env SET / [x] curl /health → 200` |
 | cross-cutting | Composite (all impacted TF VERIFY pass) | No standalone test |
 
-Use this table when prompting boss for VERIFY content.
+Use this table when prompting developer for VERIFY content.
 
 ## NFR (Non-Functional Requirements) — 2 layers
 
-**Layer 0 (Boss invariants)** — `boss.md` section. Default 4 categories:
+**Layer 0 (Project invariants)** — `problem.md` section. Default 4 categories:
 - Security
 - Data integrity
 - Determinism
@@ -167,31 +183,29 @@ Use this table when prompting boss for VERIFY content.
 
 **Layer 1 (TF-local NFR)** — Per TF in `tfs.md`. Specific to one TF.
 
-**Promotion rule**: When same NFR appears in **2+ TFs**, agent posts to `threads/promote-{nfr}.md`. Boss confirms = move to Layer 0.
+**Promotion rule**: When same NFR appears in **2+ TFs**, agent posts to `threads/promote-{nfr}.md`. Developer confirms = move to Layer 0.
 
 ## Step N+2: Output to humanpowers workspace
 
-Save outputs to `~/humanpowers/{project-name}/`:
-- `boss.md` — Charter + invariants + persona
-- `tfs.md` — TF list (5 fields above)
-- `views/macro.md`, `views/spec.md`, `views/progress.md` — auto-rendered (run `scripts/render-views.sh`)
+Save output to `<workspace>/.humanpowers/problem.md` (use template at `references/templates/problem.md`).
 
-Set `.humanpowers/state.json` phase = `brainstorm-done`. Next phase = `quiz`.
+Set `.humanpowers/state.json` phase = `problem-defined` via:
+
+```bash
+WS="$(dirname "$(find . -maxdepth 3 -name state.json -path '*/.humanpowers/*' | head -1)")"
+WS="$(dirname "$WS")"
+bash scripts/update-state.sh "$WS" phase problem-defined
+```
+
+Next phase = `quiz`.
 
 ## Step N+3: Hand off to quiz
 
-Terminal state of brainstorming: invoke humanpowers:quiz skill (NOT writing-plans). Quiz module forces boss to articulate expected outputs per TF before any implementation plan.
+Terminal state of brainstorming: invoke humanpowers:quiz skill (NOT writing-plans). Quiz module forces the developer to articulate expected outputs per TF before any implementation plan.
 
 ## Documentation
 
-humanpowers writes structured outputs (NOT a single design.md). Save to `~/humanpowers/{project-name}/`:
-
-- `boss.md` — Charter, invariants, persona
-- `tfs.md` — TF list with 5 fields each
-- `views/{macro,spec,progress}.md` — auto-rendered from tfs.md
-- `.humanpowers/state.json` — phase tracking
-
-After boss approval, commit. Next: humanpowers:quiz.
+humanpowers writes `<workspace>/.humanpowers/problem.md` (from `references/templates/problem.md`). After sign-off, transition phase to `problem-defined` via `scripts/update-state.sh`. Next: humanpowers:quiz.
 
 **Spec Self-Review:**
 After writing the spec document, look at it with fresh eyes:
@@ -212,7 +226,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 **Quiz handoff:**
 
-- Invoke the humanpowers:quiz skill to force boss articulation of expected outputs per TF
+- Invoke the humanpowers:quiz skill to force developer articulation of expected outputs per TF
 - Do NOT invoke writing-plans or any other implementation skill. humanpowers:quiz is the next step.
 
 ## Key Principles
