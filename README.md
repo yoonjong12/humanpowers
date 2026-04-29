@@ -41,33 +41,33 @@ After install, restart the session, then in any directory:
 /humanpowers
 ```
 
-The dispatcher detects whether a workspace exists and routes accordingly:
+The dispatcher detects whether a workspace exists at or above cwd and routes accordingly:
 
-- No workspace → scaffold a new one (asks for project name).
-- Workspace exists → resume the current phase (design / quiz / plan / build / verify / review / finish).
+- No workspace → creates `.humanpowers/` at the appropriate location (repo root if cwd is inside a git repo, else cwd) and starts brainstorming the problem.
+- Workspace exists → resumes the current phase (brainstorm / quiz / plan / operate / verify / review / finish).
 
 ## Core concepts
 
 | Concept | What it means |
 |---------|---------------|
-| **Workspace** | A per-project directory at `~/humanpowers/{project-name}/` with the project charter, unit registry, views, and per-unit artifacts. Separate from the plugin's source code. |
+| **Workspace** | A `.humanpowers/` directory holding `problem.md`, `tfs.md`, and per-TF artifacts. Lives in your repo root (in-repo mode) or cwd (external mode), determined automatically from cwd context. |
 | **Unit (TF)** | An atomic slice of work with five fields: who, what, why, how to verify, local non-functional requirements. Units have an `action_type` (ui / api / data / infra / cross-cutting) and a `depends_on` graph. |
 | **Views** | Auto-rendered matrices over the unit registry — concern × action_type, units × fields, units × stage. Read-only; regenerate from the registry. |
-| **Quiz** | A required step between design and implementation. The agent drills the developer per unit on vague terms, edge cases, and quantitative thresholds, one question at a time. The signed-off output is the test spec. |
+| **Quiz** | A required step between brainstorming and planning. The agent drills the developer per unit on vague terms, edge cases, and quantitative thresholds, one question at a time. The signed-off output is the test spec. |
 | **Dispatcher** | A single entry point (`/humanpowers`) that auto-routes to the next phase based on workspace state. |
 
 ## Workflow
 
 ```
-design  →  quiz  →  plan  →  build  →  verify  →  review  →  finish
-   │         │        │        │         │          │           │
-   │         │        │        │         │          │           └─ developer signs off, version bump, optional release
-   │         │        │        │         │          └─ aggregate state + cascade decisions across units
-   │         │        │        │         └─ developer-watched demo per unit, signed acceptance
-   │         │        │        └─ implement per-unit build plan (TDD)
-   │         │        └─ unit-by-unit build plan with explicit pre-build gate
-   │         └─ per-unit, per-question elicitation; output is the unit's test spec
-   └─ explore intent, decompose into units, lock NFR
+brainstorm  →  quiz  →  plan  →  operate  →  verify  →  review  →  finish
+    │           │        │         │           │          │           │
+    │           │        │         │           │          │           └─ developer signs off, version bump, optional release
+    │           │        │         │           │          └─ aggregate state + cascade decisions across units
+    │           │        │         │           └─ developer-watched demo per unit, signed acceptance
+    │           │        │         └─ implement per-unit plan (TDD)
+    │           │        └─ unit-by-unit plan with explicit pre-build gate
+    │           └─ per-unit, per-question elicitation; output is the unit's test spec
+    └─ articulate the problem (problem.md) and decompose into units
 ```
 
 Each phase has a corresponding skill; the dispatcher invokes the right one. The developer can take manual control at any point:
