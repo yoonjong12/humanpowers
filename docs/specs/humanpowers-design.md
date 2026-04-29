@@ -2,163 +2,246 @@
 
 ## Goal
 
-Generalize humanpowers from a scaffold-only framework into a problem-first, transferable framework that handles greenfield scaffolding, existing-codebase adaptation, and any other unit of work — without forcing the developer into a single shape of session.
+Design-first AI-assisted development. Generalizes vocabulary, commit policy, and skill surface so the workflow is transferable to any developer (not just internal users) and any unit of work (greenfield or adapter, single feature or larger).
 
 ## Core Invariant
 
-The developer's articulated problem definition is load-bearing. The agent + superpowers discipline + humanpowers-specific augmentation (TF model, quiz, cascade, AUQ) is the executor.
+The developer's articulated problem definition is load-bearing. The agent + superpowers discipline + humanpowers-specific augmentation (per-task quiz, per-task plan, per-task verify, cross-task cascade) is the executor.
 
 Three things are essential, in this order:
 
-1. **Problem definition** — what the developer is trying to solve. Output of brainstorming + quiz, stored as `problem.md`.
-2. **TF decomposition** — atomic units derived from the problem. Each TF lists its files (new or existing), action_type, and dependencies. Stored as `tfs.md`.
-3. **Per-TF loop** — quiz → plan → operate → verify, identical regardless of whether the TF creates new code or modifies existing code.
-
-Mode-switching ("scaffold mode vs adapter mode") is rejected. The dispatcher treats new-vs-existing as a property of the workspace and the TF, not as a choice the user makes upfront.
+1. **Problem definition** — what the developer is trying to solve. Output of brainstorming, stored as `problem.md`.
+2. **Task decomposition** — atomic units derived from the problem. Each task lists its files (new or existing), action_type, dependencies, and task-local NFR. Stored as `tasks.md`.
+3. **Per-task loop** — quiz round 1 (mandatory) → optional quiz round 2 → plan → operate → verify, identical regardless of greenfield or adapter.
 
 ## Workspace
 
+### Privacy model
+
+The entire `.humanpowers/` workspace is local-only. The repo's root `.gitignore` excludes it. Working artifacts (problem.md, tasks.md, per-task quiz / plan / verify, scratchpads) live on the developer's machine and never enter the PR or main branch.
+
+The decision artifact is created at the `finish` phase as `docs/decisions/<slug>.md` and committed. This file is the single durable record of the design — its rationale, key decisions, and verify outcomes — without exposing personal working memos.
+
 ### Location
 
-Determined by cwd context, not by user prompt:
+Determined by cwd context, unchanged from prior version:
 
-- **cwd is inside a git repo** → `<repo-root>/.humanpowers/`. workspace_kind = `in-repo`. target_repo = repo root.
-- **cwd is outside a git repo** → `<cwd>/.humanpowers/`. workspace_kind = `external`. target_repo = null until operate phase decides.
+- **cwd inside a git repo** → `<repo-root>/.humanpowers/`. workspace_kind = `in-repo`. target_repo = repo root.
+- **cwd outside a git repo** → `<cwd>/.humanpowers/`. workspace_kind = `external`. target_repo = null until operate phase.
 - **`.humanpowers/state.json` found upward from cwd** → resume that session.
 
 ### Structure
 
 ```
 .humanpowers/
-├── state.json          # phase, target_repo, workspace_kind, TF counts
-├── problem.md          # problem definition (brainstorm output)
-├── tfs.md              # TF list with action_type / files / depends_on
-├── tfs/
-│   └── TF-NN/
-│       ├── quiz.md     # signed-off expected-outputs (test spec)
-│       ├── plan.md     # per-TF build plan
-│       └── verify.md   # verification log
-├── views/              # auto-rendered matrices
-└── shelves/            # rolling 1-session scratchpads
+├── state.json           # phase, target_repo, workspace_kind, task counts
+├── problem.md           # problem definition (with Project invariants section)
+├── tasks.md             # task list with action_type, depends_on, task-local NFR
+└── tasks/
+    └── {id}/            # numeric ID — 1, 2, 3 …
+        ├── round1.md    # mandatory quiz (agent-led)
+        ├── round2.md    # optional quiz (developer-led)
+        ├── plan.md      # implementation plan
+        └── verify.md    # verification log
 ```
+
+The `views/` auto-rendered matrices and `shelves/` rolling scratchpads from prior versions are removed. `views/` were never reviewed in practice; `shelves/` are made redundant by structured artifacts (state.json + per-task files + git log) and would require a hook to maintain.
 
 ### state.json schema
 
 ```json
 {
-  "phase": "problem-defined | quiz-done | planned | built | verified",
+  "phase": "problem-defined | quiz-done | planned | built | verified | aborted",
   "target_repo": "/abs/path or null",
   "workspace_kind": "in-repo | external",
-  "tfs_total": 0,
-  "tfs_quiz_done": 0,
-  "tfs_built": 0,
-  "tfs_verified": 0
+  "tasks_total": 0,
+  "tasks_quiz_done": 0,
+  "tasks_built": 0,
+  "tasks_verified": 0
 }
 ```
 
-No schema_version field. Compatibility checked by required-field presence; missing field → dispatcher errors with re-init instruction.
+No schema_version field. Compatibility checked by required-field presence; missing required field → dispatcher fails fast with re-init instruction.
 
-### Git-ignore policy (in-repo workspaces)
+### Gitignore policy
 
-`.humanpowers/state.json` and `.humanpowers/shelves/` are git-ignored. `problem.md`, `tfs.md`, per-TF `quiz.md`, `plan.md`, `verify.md`, and `views/` are committed — they are the design artifact.
+The repo's `.gitignore` excludes the entire `.humanpowers/` directory. There is no partial commit. `state.json`, `problem.md`, `tasks.md`, and per-task files all stay local.
+
+## Commit policy
+
+### Working phase
+
+`.humanpowers/` is local. Code changes that the developer makes during the operate phase commit as normal — the implementation goes onto the feature branch via the developer's regular git workflow (independent of humanpowers).
+
+### Finish phase
+
+When all tasks reach `verified` and the developer runs `/humanpowers continue` or `/humanpowers review`, the dispatcher hands off to `humanpowers:finishing-a-development-branch`. That skill:
+
+1. Reads `problem.md`, `tasks.md`, and per-task `verify.md` files.
+2. Asks the developer for a short slug (e.g., `pcr-curator-review-injection`).
+3. Writes `docs/decisions/<slug>.md` using the ADR template below.
+4. Adds and commits the ADR file (the only artifact added by humanpowers to the repo).
+5. Optionally prompts for version bump and release if the project uses semver.
+
+### ADR template
+
+```markdown
+# <feature title>
+
+## Status
+
+Accepted (or: Superseded by `docs/decisions/<other>.md`)
+
+## Problem
+
+<one-paragraph summary derived from problem.md>
+
+## Project invariants
+
+- <each invariant as a bullet>
+
+## Decisions
+
+For each task, summarize the key decisions made during quiz and plan. One sentence per task is enough; reference the file paths the task touched.
+
+## Alternatives considered
+
+- <alternatives surfaced during brainstorming or quiz round 2>
+
+## Consequences
+
+- <what changed in the repo, what is now possible, what new constraints>
+
+## Verify outcomes
+
+For each task, one line on what was verified and how (test pass, demo signoff, etc.).
+```
 
 ## Dispatcher
 
-### Behavior
+Behavior identical to prior version with field renames (`tfs_*` → `tasks_*`) and the new commit policy reflected in the workspace creation step.
 
-`/humanpowers` runs the following:
+`/humanpowers` runs:
 
 1. Search upward from cwd for `.humanpowers/state.json`.
-2. If found → read `phase`, route to next skill.
-3. If not found → determine workspace location (rules above), create empty `.humanpowers/state.json` skeleton, hand off to humanpowers:brainstorming.
+2. If found → validate schema with `scripts/check-state.sh`, route by phase.
+3. If not found → determine workspace location, create `.humanpowers/` skeleton (mkdir + state.json), hand off to brainstorming.
 
 ### Phase routing
 
-| phase | Next skill | Output |
-|-------|-----------|--------|
-| (empty) | brainstorming | `problem.md`, phase = `problem-defined` |
-| `problem-defined` | quiz | per-TF `quiz.md`, phase = `quiz-done` (when all TFs quiz-done) |
-| `quiz-done` | writing-plans | per-TF `plan.md`, phase = `planned` |
-| `planned` | operate | per-TF code, phase = `built` (when all TFs built) |
-| `built` | verification-before-completion | per-TF `verify.md`, phase = `verified` |
-| `verified` | review or finishing-a-development-branch | cascade decisions / release |
+| phase | Next skill |
+|-------|-----------|
+| `""` (empty) | brainstorming |
+| `problem-defined` | quiz |
+| `quiz-done` | writing-plans |
+| `planned` | operate (per remaining task; supports `--batch` for multi-task) |
+| `built` | verification-before-completion |
+| `verified` (some tasks) | review or operate (next task) |
+| `verified` (all tasks) | finishing-a-development-branch |
 
 ### Subcommands
 
-`/humanpowers continue | jump <phase> | operate <TF-id> | review | abort`
+`/humanpowers continue | jump <phase> | operate <task-id> | review | abort`
 
-`continue` resumes auto-routing. `jump` warns when skipping a gate. `operate <TF-id>` works on a single TF regardless of phase. `review` enters cross-TF review. `abort` marks workspace aborted.
+Same semantics as prior version. `operate <task-id>` works on a single task; `operate --batch` works on all remaining unbuilt tasks. The plain `continue` form auto-selects per the routing table.
 
 ### Responsibility split
 
-- **dispatcher** owns workspace structure (creating `.humanpowers/`, state.json, deciding workspace_kind).
-- **brainstorming** owns problem definition (writing `problem.md`, transitioning phase).
-
-This separates concerns: dispatcher knows about filesystem layout, brainstorming knows about problem elicitation.
+- **Dispatcher** owns workspace structure (creating `.humanpowers/`, state.json, deciding workspace_kind).
+- **Brainstorming** owns problem definition (writing `problem.md` with the Project invariants section, transitioning phase).
+- **Quiz** owns per-task expected behavior (writing `round1.md` mandatory, `round2.md` optional).
+- **Writing-plans** owns per-task implementation plan (writing `plan.md`, including the depends_on graph in `tasks.md`).
+- **Operate** owns implementation. Per-task by default; `--batch` mode for multiple tasks at once.
+- **Verification-before-completion** owns per-task acceptance.
+- **Review** owns cross-task cascade decisions.
+- **Finishing-a-development-branch** owns ADR digest + release.
 
 ## Skills
 
-Total: 18 skills (down from 19 in v0.1.x).
+Total: 17 (down from 18 in prior version). `executing-plans` is removed; its batch mode is absorbed into `operate`.
 
 ### humanpowers-specific (5)
 
-`quiz`, `writing-plans`, `operate`, `verification-before-completion`, `review`. Behavior unchanged from v0.1.x.
+`quiz`, `writing-plans`, `operate`, `verification-before-completion`, `review`. All updated for v0.3 vocabulary and the merged batch mode.
 
-### superpowers-inherited generic discipline (8)
+### Pipeline entry/exit (4)
 
-`systematic-debugging`, `test-driven-development`, `requesting-code-review`, `receiving-code-review`, `using-git-worktrees`, `writing-skills`, `subagent-driven-development`, `dispatching-parallel-agents`. Unchanged.
+`humanpowers` (dispatcher), `brainstorming`, `using-humanpowers`, `finishing-a-development-branch`. The finish skill now writes the ADR digest.
 
-### Alternate flow (1)
+### Generic superpowers-inherited discipline (7)
 
-`executing-plans` — batch alternative to per-TF operate. Unchanged.
+`systematic-debugging`, `test-driven-development`, `requesting-code-review`, `receiving-code-review`, `using-git-worktrees`, `writing-skills`, `dispatching-parallel-agents`. Unchanged in behavior; vocabulary swept (e.g., "TF" → "task").
 
-### Finish (1)
+### Subagent wrapper (1)
 
-`finishing-a-development-branch`. Unchanged.
+`subagent-driven-development`. Used by `writing-plans` and (optionally) by `operate` for parallel-eligible tasks.
 
-### Modified (3)
+### Removed
 
-- **`humanpowers` (dispatcher)** — context detection (in-repo vs external), workspace skeleton creation, simplified phase routing. No scaffold branch.
-- **`brainstorming`** — when invoked with empty state.json, produces `problem.md` and transitions phase to `problem-defined`. Inherits superpowers brainstorming discipline.
-- **`using-humanpowers`** — docs reflect problem-first abstraction, scaffold-free entry, Subcommands vocabulary.
+- `executing-plans` — merged into `operate` with `--batch`.
 
-### Deleted (1)
+## Vocabulary
 
-- **`scaffold`** — absorbed into dispatcher's workspace-creation step.
+The plugin replaces internal abbreviations and persona slang with full, agreed-upon words. Indexing uses plain numbers; communication uses agreed terms.
 
-## Cleanup
+| Replaced | New |
+|----------|-----|
+| TF (Task Force) | task |
+| TF-{id} | task {id} (in references); plain `{id}` in paths |
+| TF-CC | cross-cutting task |
+| AUQ | AskUserQuestion (Claude Code tool name, written out) |
+| D1 (mandatory quiz round) | round 1 (agent-led) |
+| D2 (optional quiz round) | round 2 (developer-led) |
+| SDD | subagent-driven development |
+| Boss (persona) | developer |
+| Boss invariant | project invariant |
+| Layer 0 | project invariants |
+| Layer 1 (NFR) | task-local NFR |
+| WS (in prose) | workspace (`WS` retained as a shell variable) |
+| CSO | Claude Search Optimization |
+| `tfs.md` | `tasks.md` |
+| `tfs/TF-{id}/` | `tasks/{id}/` |
+| `response-d1-*.md` | `round1.md` (or `response-round1-*.md` for templates) |
+| `response-d2-*.md` | `round2.md` (or `response-round2-*.md` for templates) |
 
-The following are removed in this design pass:
+Industry-standard abbreviations are kept: TDD, NFR, SSOT, RACI, HITL, YAGNI, DRY, VCS, MCP, LLM, API, UI, data, infra. The "Layer 1-4" terminology in `systematic-debugging/defense-in-depth.md` refers to defense-architecture layers (industry usage) and is unrelated to the NFR layer terminology being retired.
 
-- **scaffold skill** — replaced by dispatcher inline logic.
-- **Orphan superpowers-internal skill-development artifacts** in `skills/systematic-debugging/`: `CREATION-LOG.md`, `test-academic.md`, `test-pressure-1.md`, `test-pressure-2.md`, `test-pressure-3.md`. Zero references; pure dev artifacts.
-- **Date-stamped doc filenames** — `docs/specs/`, `docs/plans/`, `docs/E2E-self-test-*` use topic-only names. Git history preserves chronology.
-- **"boss" vocabulary** — replaced with "developer" or "user" across skills, README, and docs. Reason: "boss" was internal humanpowers slang from the original scaffold-centric framing; the generalized abstraction is developer-facing.
+## Hooks
 
-The following were initially flagged but are kept after reference-graph verification:
+The plugin no longer ships any hooks. Earlier versions had a `PostToolUse` hook on Edit/Write that truncated `.humanpowers/shelves/` files. With shelves removed, the hook is unnecessary.
 
-- `writing-skills/anthropic-best-practices.md`, `persuasion-principles.md`, `testing-skills-with-subagents.md` — JIT-loaded by `writing-skills/SKILL.md`.
-- `brainstorming/visual-companion.md` — JIT-loaded by `brainstorming/SKILL.md`.
-- `systematic-debugging/root-cause-tracing.md`, `defense-in-depth.md`, `condition-based-waiting.md` — JIT-loaded by `systematic-debugging/SKILL.md`.
-- `dispatching-parallel-agents/SKILL.md` — referenced by `writing-plans/SKILL.md` for parallel-eligible TFs.
+`hooks/hooks.json` and `scripts/shelf-truncate.sh` are deleted in this design pass. Future hook needs (e.g., automatic phase validation, ADR-required gating) can be added if real friction emerges, but the current design has no candidate that justifies the maintenance overhead.
+
+## Cleanup tasks
+
+This design pass requires the following cleanup. All are mechanical once vocabulary is agreed.
+
+- Vocabulary sweep across all `skills/`, `references/`, `README.md`, manifests, and scripts. Excludes `docs/specs/` and `docs/plans/legacy/` (frozen historical records).
+- Filename renames: `tfs.md` → `tasks.md`, `tfs/TF-{id}/` → `tasks/{id}/`, `response-d{1,2}-*` → `response-round{1,2}-*` or `round{1,2}.md`.
+- Skill removals and merges per Skills section.
+- Hook and shelf removal per Hooks section.
+- `views/` directory removal (no longer auto-rendered).
+- `.gitignore` simplification: replace partial-commit rules with `.humanpowers/` only.
+- The 4-file "Boss invariants / Layer 0" leak found during audit (skills/review/SKILL.md, skills/operate/SKILL.md, skills/brainstorming/SKILL.md, references/templates/critique-axes.md) is subsumed by the vocabulary sweep.
 
 ## Migration
 
-Hard cutover. No backward compatibility for v0.1.x workspaces.
+Hard cutover. No backward compatibility for v0.2 workspaces.
 
-If an old workspace is found (state.json missing required fields `target_repo` or `workspace_kind`), the dispatcher fails fast with: "v0.1.x workspace detected. Delete `.humanpowers/` and re-init with `/humanpowers`."
+If `.humanpowers/state.json` from a prior version is found (with `tfs_*` fields or no `target_repo` field), the dispatcher errors with: "Workspace from a prior plugin version detected. Delete `.humanpowers/` and re-init with `/humanpowers`."
+
+The check-state.sh script enforces this via required-field presence. v0.3 fields: `phase`, `target_repo`, `workspace_kind`, `tasks_total`, `tasks_quiz_done`, `tasks_built`, `tasks_verified`.
 
 Versioning is kept only where required by external systems: `plugin.json` `version`, git tags, and release notes. No version strings in code, doc bodies, or filenames.
 
-## Out of Scope
+## Out of scope
 
-This design does not address:
-
-- **Vibe coding** (no design phase, free exploration). Users who want this should not invoke `/humanpowers`. The plugin's value proposition is design-first; bypassing the design phase would defeat its purpose.
-- **Pure debugging or pure code review** with no design phase. Use superpowers' `systematic-debugging` or `requesting-code-review` skills directly. humanpowers does not wrap them.
+- **Vibe coding** (no design phase, free exploration). Use superpowers skills directly without invoking `/humanpowers`.
+- **Pure debugging or pure code review** with no design phase. Use `superpowers:systematic-debugging` or `superpowers:requesting-code-review` directly.
 - **Multi-developer concurrent sessions** on the same workspace. Single-developer-per-workspace assumed.
-- **Cross-repo TFs** (a single TF spanning multiple repos). Each TF lives in one workspace; multi-repo work uses one workspace per repo with thread-style cross-references.
+- **Cross-repo tasks** (a single task spanning multiple repos). One workspace per repo.
+- **Automatic raw-artifact backup** (e.g., to a personal repo or cloud). The privacy model assumes raw artifacts are local-only and the developer accepts that they vanish if the machine is lost. The ADR digest is the only durable record.
 
-## Out of Workflow
+## Out of workflow
 
-The dispatcher provides one canonical flow (problem → quiz → plan → operate → verify → review → finish). For work that does not fit this shape (a single-line config edit, an emergency hotfix), the developer invokes the relevant skill directly without going through `/humanpowers`. humanpowers does not block or interpose; it simply does not start.
+The dispatcher provides one canonical flow. For work that does not fit (single-line config edits, emergency hotfixes), the developer invokes the relevant skill directly without going through `/humanpowers`. humanpowers does not block or interpose; it simply does not start.
