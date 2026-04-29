@@ -11,9 +11,9 @@ Use this when reading developer's quiz answer. Check each axis. ANY hit = additi
 
 ## Axis 2 — Consistency (일관성)
 
-- TF spec NFR (Layer 1) 와 모순
-- 다른 TF 답안 (다른 expected-outputs.md) 와 모순
-- problem.md 불변식 (Layer 0) 위반
+- task spec NFR (task-local NFR) 와 모순
+- 다른 task 답안 (다른 expected-outputs.md) 와 모순
+- problem.md 불변식 (project invariants) 위반
 
 ## Axis 3 — Completeness (완결성)
 
@@ -35,4 +35,4 @@ Critique ends when ALL 4 axes return 0 issues for the current Q.
 
 ## Anti-pattern
 
-NEVER bulk-dump all axes' issues in one AUQ message ending "Thoughts?". One AUQ call per critique.
+NEVER bulk-dump all axes' issues in one AskUserQuestion message ending "Thoughts?". One AskUserQuestion call per critique.

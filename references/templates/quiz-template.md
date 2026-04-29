@@ -1,9 +1,9 @@
-# {TF-id} {TF-name} — Expected Outputs Quiz
+# {task-id} {task-name} — Expected Outputs Quiz
 
 > Status: draft | reviewing | signed_off
 > action_type: ui | api | data | infra | cross-cutting
 > Generated: {date}
-> Linked TF spec: tfs.md#TF-{id}
+> Linked task spec: tasks.md#{id}
 
 ## Q1: {question 1-line summary}
 

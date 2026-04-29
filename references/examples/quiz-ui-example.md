@@ -1,9 +1,9 @@
-# TF-{X} Generic UI Form — Expected Outputs Quiz (EXAMPLE, signed_off)
+# Task {X} Generic UI Form — Expected Outputs Quiz (EXAMPLE, signed_off)
 
 > Status: signed_off
 > action_type: ui
 > Developer articulation: 5 questions / 18 turns
-> Linked TF spec: tfs.md#TF-{X}
+> Linked task spec: tasks.md#{X}
 
 ## Q1: Form submission behavior
 

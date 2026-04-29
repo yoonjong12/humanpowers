@@ -1,4 +1,4 @@
-# TF-{X} Generic Determinism — Expected Outputs Quiz (EXAMPLE, signed_off)
+# Task {X} Generic Determinism — Expected Outputs Quiz (EXAMPLE, signed_off)
 
 > Status: signed_off
 > action_type: cross-cutting
@@ -15,13 +15,13 @@ Which paths must be deterministic (same input → same output)?
 
 ## Q2: Composite VERIFY
 
-How does this TF "pass"?
+How does this task "pass"?
 
 **Developer answer**:
-- TF-CC = composite — passes when:
-  - TF-1a + TF-1b + TF-2a + TF-2b all run their VERIFY 3x in sequence
+- cross-cutting = composite — passes when:
+  - 1a + 1b + 2a + 2b all run their VERIFY 3x in sequence
   - All 3 runs produce identical results (byte-equal for JSON, row-equal for SQL output)
-- Failure mode: 1 of 3 runs differs → TF-CC fail → impacted TFs revert to `built` (not `verified`)
+- Failure mode: 1 of 3 runs differs → cross-cutting fail → impacted tasks revert to `built` (not `verified`)
 
 ## Q3: Exceptions allowed
 
@@ -37,6 +37,6 @@ Where determinism MAY relax?
 How catch non-determinism?
 
 **Developer answer**:
-- CI runs each impacted TF VERIFY 3x with same seed
+- CI runs each impacted task VERIFY 3x with same seed
 - diff outputs (excluding timestamp/trace_id fields)
 - Any non-empty diff = build fails

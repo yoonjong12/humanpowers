@@ -6,12 +6,12 @@ Generic abstract examples. Use these to understand the pattern, then apply to yo
 
 | File | Purpose |
 |------|---------|
-| `quiz-ui-example.md` | UI TF quiz, signed_off — Gherkin VERIFY |
-| `quiz-api-example.md` | API TF quiz, signed_off — cURL VERIFY |
-| `quiz-data-example.md` | Data TF quiz, signed_off — SQL assertion |
-| `quiz-infra-example.md` | Infra TF quiz, signed_off — checklist + curl |
-| `quiz-crosscut-example.md` | Cross-cutting TF, signed_off — composite VERIFY |
-| `d2-discussion-example.md` | D2 developer vs agent discrepancy → discussion → cascade |
+| `quiz-ui-example.md` | UI task quiz, signed_off — Gherkin VERIFY |
+| `quiz-api-example.md` | API task quiz, signed_off — cURL VERIFY |
+| `quiz-data-example.md` | Data task quiz, signed_off — SQL assertion |
+| `quiz-infra-example.md` | Infra task quiz, signed_off — checklist + curl |
+| `quiz-crosscut-example.md` | Cross-cutting task, signed_off — composite VERIFY |
+| `round2-discussion-example.md` | Round 2 developer vs agent discrepancy → discussion → cascade |
 
 ## How to use
 

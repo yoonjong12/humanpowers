@@ -1,4 +1,4 @@
-# TF-{X} Generic Service Deployment — Expected Outputs Quiz (EXAMPLE, signed_off)
+# Task {X} Generic Service Deployment — Expected Outputs Quiz (EXAMPLE, signed_off)
 
 > Status: signed_off
 > action_type: infra

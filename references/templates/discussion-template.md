@@ -22,9 +22,9 @@
 **Agent 응답**: ...
 
 **Cascade 영향 범위**:
-- [ ] 해당 TF expected-outputs 갱신
-- [ ] 해당 TF 5필드 spec (tfs.md) 갱신
+- [ ] 해당 task expected-outputs 갱신
+- [ ] 해당 task 5필드 spec (tasks.md) 갱신
 - [ ] problem.md 불변식 / 페르소나 갱신
-- [ ] 다른 TF 영향 (flag only — 보스 명시 invoke 필요)
+- [ ] 다른 task 영향 (flag only — developer 명시 invoke 필요)
 
 **Final**:
