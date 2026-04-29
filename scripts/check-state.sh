@@ -13,9 +13,9 @@ if [ ! -f "$STATE" ]; then
 fi
 
 # Required fields per humanpowers-design.md
-for field in phase target_repo workspace_kind tfs_total tfs_quiz_done tfs_built tfs_verified; do
+for field in phase target_repo workspace_kind tasks_total tasks_quiz_done tasks_built tasks_verified; do
   if ! jq -e "has(\"$field\")" "$STATE" >/dev/null 2>&1; then
-    echo "ERROR: state.json missing required field '$field'. v0.1.x workspace detected. Delete .humanpowers/ and re-init with /humanpowers." >&2
+    echo "ERROR: state.json missing required field '$field'. Workspace from a prior plugin version detected. Delete .humanpowers/ and re-init with /humanpowers." >&2
     exit 1
   fi
 done
@@ -23,18 +23,18 @@ done
 PHASE=$(jq -r .phase "$STATE")
 TARGET=$(jq -r .target_repo "$STATE")
 KIND=$(jq -r .workspace_kind "$STATE")
-TFS_TOTAL=$(jq -r .tfs_total "$STATE")
-TFS_QUIZ=$(jq -r .tfs_quiz_done "$STATE")
-TFS_BUILT=$(jq -r .tfs_built "$STATE")
-TFS_VER=$(jq -r .tfs_verified "$STATE")
+TASKS_TOTAL=$(jq -r .tasks_total "$STATE")
+TASKS_QUIZ=$(jq -r .tasks_quiz_done "$STATE")
+TASKS_BUILT=$(jq -r .tasks_built "$STATE")
+TASKS_VER=$(jq -r .tasks_verified "$STATE")
 
 cat <<EOF
 phase: $PHASE
 target_repo: $TARGET
 workspace_kind: $KIND
-tfs:
-  total: $TFS_TOTAL
-  quiz-done: $TFS_QUIZ
-  built: $TFS_BUILT
-  verified: $TFS_VER
+tasks:
+  total: $TASKS_TOTAL
+  quiz-done: $TASKS_QUIZ
+  built: $TASKS_BUILT
+  verified: $TASKS_VER
 EOF
