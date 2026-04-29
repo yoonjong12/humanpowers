@@ -1,17 +1,28 @@
 # humanpowers
 
-> Forked from [superpowers](https://github.com/obra/superpowers) (MIT, © 2025 Jesse Vincent). humanpowers extends the design with boss-articulation enforcement, TF (Task Force) model, matrix views, and Quiz module.
+> A Claude Code plugin where the developer's own design work is the load-bearing element of AI-assisted development.
+> Inspired by [superpowers](https://github.com/obra/superpowers).
 
-## Identity
+## What it does
 
-```
-superpowers = AI 가 도와줌 (인간 부담 ↓)
-humanpowers = 인간이 active 참여 강제 (인간 부담 ↑, 결과 정확 ↑)
-```
+humanpowers does not replace your design work — it **structures it**. The plugin treats the developer's articulated intent as the load-bearing element of the workflow, and the agent as a structured executor bounded by that intent.
 
-## Goal
+The contrast with a passive AI workflow:
 
-Force lazy boss to actively participate in design + verification + acceptance, preventing intent/implementation drift.
+- **superpowers**: AI does more, developer does less.
+- **humanpowers**: the developer's own design power is exercised actively, and the agent is held to what the developer wrote down.
+
+The result is a workflow where output predictability is a function of how much the developer engaged at the design phase — not of how clever the agent is at guessing.
+
+## When to use it
+
+Use humanpowers when you need:
+
+- A design phase that surfaces ambiguity before code is written.
+- Per-unit requirement specs that double as test specs.
+- Explicit gates between design → build → verification, with the developer signing off at each transition.
+
+If you want the agent to move fast on a well-understood task, plain superpowers (or no plugin at all) is the better fit.
 
 ## Installation
 
@@ -22,73 +33,57 @@ Inside Claude Code:
 /plugin install humanpowers@humanpowers-marketplace
 ```
 
-### Update
-
-```
-/plugin update humanpowers@humanpowers-marketplace
-```
-
-### Uninstall
-
-```
-/plugin uninstall humanpowers@humanpowers-marketplace
-/plugin marketplace remove humanpowers-marketplace
-```
-
-### Local development install (from cloned repo)
-
-```bash
-git clone https://github.com/yoonjong12/humanpowers ~/.local/share/humanpowers
-```
-
-```
-/plugin marketplace add ~/.local/share/humanpowers
-/plugin install humanpowers@humanpowers-marketplace
-```
-
-To pull updates locally:
-
-```bash
-git -C ~/.local/share/humanpowers pull
-```
-
-```
-/plugin update humanpowers@humanpowers-marketplace
-```
-
 ## Quick start
 
-After install, restart Claude Code session, then:
+After install, restart the session, then in any directory:
 
 ```
 /humanpowers
 ```
 
-Single entry point. Auto-detects workspace state:
+The dispatcher detects whether a workspace exists and routes accordingly:
 
-- No workspace → invokes `humanpowers:scaffold` to create `~/humanpowers/{project-name}/`
-- Workspace exists → routes to current phase (brainstorm / quiz / writing-plans / operate / verification / review / finishing)
+- No workspace → scaffold a new one (asks for project name).
+- Workspace exists → resume the current phase (design / quiz / plan / build / verify / review / finish).
 
-Workspace lives at `~/humanpowers/{project-name}/`, separate from this plugin code.
+## Core concepts
 
-## Boss override commands
+| Concept | What it means |
+|---------|---------------|
+| **Workspace** | A per-project directory at `~/humanpowers/{project-name}/` with the project charter, unit registry, views, and per-unit artifacts. Separate from the plugin's source code. |
+| **Unit (TF)** | An atomic slice of work with five fields: who, what, why, how to verify, local non-functional requirements. Units have an `action_type` (ui / api / data / infra / cross-cutting) and a `depends_on` graph. |
+| **Views** | Auto-rendered matrices over the unit registry — concern × action_type, units × fields, units × stage. Read-only; regenerate from the registry. |
+| **Quiz** | A required step between design and implementation. The agent drills the developer per unit on vague terms, edge cases, and quantitative thresholds, one question at a time. The signed-off output is the test spec. |
+| **Dispatcher** | A single entry point (`/humanpowers`) that auto-routes to the next phase based on workspace state. |
 
-| Command | Action |
-|---------|--------|
-| `/humanpowers` | resume current phase (auto-route) |
-| `/humanpowers continue` | same as above |
-| `/humanpowers jump {phase}` | force jump (warns if skipping) |
-| `/humanpowers operate {TF-id}` | run as TF Lead for one TF |
-| `/humanpowers review` | aggregate state + cascade decisions |
-| `/humanpowers abort` | mark workspace aborted |
+## Workflow
 
-## Phases
+```
+design  →  quiz  →  plan  →  build  →  verify  →  review  →  finish
+   │         │        │        │         │          │           │
+   │         │        │        │         │          │           └─ developer signs off, version bump, optional release
+   │         │        │        │         │          └─ aggregate state + cascade decisions across units
+   │         │        │        │         └─ developer-watched demo per unit, signed acceptance
+   │         │        │        └─ implement per-unit build plan (TDD)
+   │         │        └─ unit-by-unit build plan with explicit pre-build gate
+   │         └─ per-unit, per-question elicitation; output is the unit's test spec
+   └─ explore intent, decompose into units, lock NFR
+```
 
-- **Phase 1 (current)**: 14 fork skills + 4 new (quiz / scaffold / operate / review) + dispatcher + Quiz module + matrix views + workspace scaffolding + shelf-truncate hook.
-- **Phase 2 (future)**: Auto signaling via SubagentStop hook + additionalContext.
-- **Phase 3 (deferred)**: MCP server for true sync agent ↔ agent.
+Each phase has a corresponding skill; the dispatcher invokes the right one. The developer can take manual control at any point:
 
-See `docs/specs/` for full design.
+```
+/humanpowers continue            # resume current phase
+/humanpowers jump <phase>        # skip ahead (warns if skipping a gate)
+/humanpowers operate <unit-id>   # work on one specific unit
+/humanpowers review              # project-level review
+/humanpowers abort               # mark workspace aborted
+```
+
+## Documentation
+
+- `docs/specs/` — design specifications.
+- `docs/plans/` — implementation breakdown.
 
 ## License
 
