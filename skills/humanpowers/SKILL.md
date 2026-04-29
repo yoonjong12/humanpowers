@@ -1,99 +1,135 @@
 ---
 name: humanpowers
-description: Single entry point for humanpowers projects. Auto-detects current phase from .humanpowers/state.json and routes to brainstorming / quiz / writing-plans / operate (or executing-plans) / verification / review / finishing. Boss types `/humanpowers` and dispatcher figures out next step. Use this when boss says "I want to start" or "continue" or just types /humanpowers.
+description: Single entry point for humanpowers. Detects cwd context (in-repo or external), creates .humanpowers/ workspace skeleton when absent, then routes by phase. Developer types `/humanpowers` (optionally with a Subcommand) and the dispatcher determines the next skill. Use whenever the developer wants to start or resume design-first work.
 ---
 
 # humanpowers Dispatcher
 
 ## Behavior
 
-Single entry to humanpowers workflow. Detects state, dispatches to appropriate skill.
+Single entry to humanpowers. Two responsibilities:
 
-## State detection
+1. **Workspace structure** — locate or create `.humanpowers/` and seed `state.json`.
+2. **Phase routing** — read `state.json` and hand off to the next skill.
+
+The dispatcher does not author content. brainstorming owns problem definition; quiz / writing-plans / operate / verification / review own per-TF work.
+
+## Step 1: Locate workspace
 
 ```bash
-# Check if cwd is inside ~/humanpowers/{project}/
+# Search upward from cwd for .humanpowers/state.json (closest wins)
 WS=""
-if [[ "$(pwd)" == "$HOME/humanpowers/"* ]]; then
-  WS=$(echo "$(pwd)" | sed -E "s|($HOME/humanpowers/[^/]+).*|\1|")
-fi
-
-# Or check if state.json exists in any cd-able subdir
-if [ -z "$WS" ] && [ -f ./.humanpowers/state.json ]; then
-  WS="$(pwd)"
-fi
+DIR="$(pwd)"
+while [ "$DIR" != "/" ]; do
+  if [ -f "$DIR/.humanpowers/state.json" ]; then
+    WS="$DIR"
+    break
+  fi
+  DIR="$(dirname "$DIR")"
+done
 ```
 
-If no workspace → invoke humanpowers:scaffold (Step 1 below).
+If `WS` is non-empty → existing workspace, jump to Step 3.
 
-If workspace exists → read `state.json` field `phase` and dispatch (Step 2).
+If `WS` is empty → no workspace, go to Step 2.
 
-## Step 1: No workspace → scaffold
-
-Output to Claude:
-```
-No humanpowers workspace detected.
-Invoking humanpowers:scaffold to initialize a new project.
-```
-
-Hand off to humanpowers:scaffold.
-
-## Step 2: Workspace exists → state echo + dispatch
-
-Read `.humanpowers/state.json`:
+## Step 2: Create workspace skeleton
 
 ```bash
-PHASE=$(jq -r .phase ~/humanpowers/{project}/.humanpowers/state.json)
-TFS_TOTAL=$(jq -r .tfs_total ...)
-TFS_QUIZ_DONE=$(jq -r .tfs_quiz_done ...)
-TFS_BUILT=$(jq -r .tfs_built ...)
-TFS_VERIFIED=$(jq -r .tfs_verified ...)
+# Decide workspace_kind and target_repo from cwd context
+if git rev-parse --show-toplevel >/dev/null 2>&1; then
+  REPO_ROOT="$(git rev-parse --show-toplevel)"
+  WS_DIR="$REPO_ROOT/.humanpowers"
+  KIND="in-repo"
+  TARGET="$REPO_ROOT"
+else
+  WS_DIR="$(pwd)/.humanpowers"
+  KIND="external"
+  TARGET="null"
+fi
+
+mkdir -p "$WS_DIR/tfs" "$WS_DIR/views" "$WS_DIR/shelves"
+
+# Seed state.json from template (target_repo as JSON null when external)
+if [ "$TARGET" = "null" ]; then
+  TARGET_JSON="null"
+else
+  TARGET_JSON="\"$TARGET\""
+fi
+
+cat > "$WS_DIR/state.json" <<EOF
+{
+  "phase": "",
+  "target_repo": $TARGET_JSON,
+  "workspace_kind": "$KIND",
+  "tfs_total": 0,
+  "tfs_quiz_done": 0,
+  "tfs_built": 0,
+  "tfs_verified": 0
+}
+EOF
 ```
 
-Output state echo:
+Output to user:
+
 ```
-Currently in: ~/humanpowers/{project}/
-Phase: {PHASE}
-TFs: {VERIFIED}/{TOTAL} verified, {BUILT}/{TOTAL} built, {QUIZ_DONE}/{TOTAL} quiz-done
+Workspace created: <WS_DIR>
+workspace_kind: <KIND>
+target_repo: <TARGET>
+
+Invoking humanpowers:brainstorming to define the problem.
 ```
 
-## Step 3: Phase routing
+Hand off to `humanpowers:brainstorming`. brainstorming will produce `problem.md` and set `phase = problem-defined`.
+
+## Step 3: Existing workspace — validate + route
+
+Validate schema with `scripts/check-state.sh "$WS"`. If exit code 1, propagate the error message verbatim and stop.
+
+Read phase:
+
+```bash
+PHASE=$(jq -r .phase "$WS/.humanpowers/state.json")
+```
+
+Route:
 
 | phase | Next skill |
 |-------|-----------|
-| `brainstorm` | humanpowers:brainstorming |
-| `brainstorm-done` | humanpowers:quiz |
+| `""` (empty) | humanpowers:brainstorming |
+| `problem-defined` | humanpowers:quiz |
 | `quiz-done` | humanpowers:writing-plans |
-| `designed` | humanpowers:operate per TF (or humanpowers:executing-plans for batch) |
+| `planned` | humanpowers:operate (per remaining TF) |
 | `built` | humanpowers:verification-before-completion |
-| `verified` (some) | humanpowers:review or continue per TF |
-| `verified` (all) | humanpowers:finishing-a-development-branch |
+| `verified` (some TFs) | humanpowers:review or humanpowers:operate (next TF) |
+| `verified` (all TFs) | humanpowers:finishing-a-development-branch |
 
-If user passed explicit phase arg (`/humanpowers quiz` etc.), override auto-routing.
+Echo current state before routing:
 
-## Step 4: Boss override commands
+```
+Workspace: <WS>
+Phase: <PHASE>
+TFs: <verified>/<total> verified, <built>/<total> built, <quiz_done>/<total> quiz-done
+```
+
+If a Subcommand was passed (e.g., `/humanpowers jump quiz`), apply the override after the echo.
+
+## Step 4: Subcommands
 
 | Command | Action |
 |---------|--------|
-| `/humanpowers continue` | resume current phase |
-| `/humanpowers jump {phase}` | force jump to phase (warn if skipping) |
-| `/humanpowers operate {TF-id}` | invoke humanpowers:operate with TF-id |
-| `/humanpowers review` | invoke humanpowers:review |
-| `/humanpowers abort` | mark workspace as aborted in state.json + STOP |
+| `/humanpowers continue` | resume current phase (default behavior) |
+| `/humanpowers jump <phase>` | force jump to phase; warn if skipping a gate |
+| `/humanpowers operate <TF-id>` | invoke humanpowers:operate with a specific TF |
+| `/humanpowers review` | invoke humanpowers:review for cross-TF cascade |
+| `/humanpowers abort` | mark workspace aborted in state.json + stop |
 
-## Step 5: Always state-echo before action
+`abort` sets `phase = "aborted"` via `scripts/update-state.sh "$WS" phase aborted`.
 
-Before invoking next skill, show:
-```
-Currently: {phase}
-Next: humanpowers:{skill}
-Or override: /humanpowers continue | jump {phase} | operate {TF} | review | abort
-```
+## Notes for skill authors
 
-Boss may interrupt to use override.
+Skills downstream of the dispatcher must:
 
-## Boundaries
-
-- Don't auto-progress past phase boundaries without boss involvement.
-- Don't skip quiz when going from brainstorm-done to writing-plans.
-- Don't claim verified without verification skill.
+- Read workspace location from cwd or upward search (same logic as Step 1). Do NOT hard-code a fixed home-relative path.
+- Read `target_repo` from `state.json` when they need the code repo (operate, verification, finishing).
+- Update phase via `scripts/update-state.sh` rather than manual jq edits.
