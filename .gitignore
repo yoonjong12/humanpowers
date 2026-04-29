@@ -1,7 +1,5 @@
 .DS_Store
-.humanpowers/state.json
-.humanpowers/shelves/
-.humanpowers/invocation-log.jsonl
+.humanpowers/
 node_modules/
 *.swp
 *.swo
