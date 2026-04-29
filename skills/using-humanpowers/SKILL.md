@@ -1,123 +1,61 @@
 ---
 name: using-humanpowers
-description: Use when starting any conversation in a humanpowers project — establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+description: Use when starting any conversation in a humanpowers context — establishes how to find and use humanpowers skills and the problem-first workflow. Auto-loads at session start when humanpowers plugin is active.
 ---
 
-## humanpowers identity
+# Using humanpowers
 
-This is a fork of superpowers' `using-superpowers` skill, rebranded for humanpowers (boss-articulation enforcement). Behavior is similar but skills load humanpowers-namespace, not superpowers.
+## What humanpowers is
 
-When in doubt, prefer **humanpowers** skills inside humanpowers projects (workspace at `~/humanpowers/{project}/`). Outside humanpowers projects, original superpowers may still be available.
+A Claude Code plugin that structures the developer's design work as the load-bearing element of AI-assisted development. The agent is a structured executor bounded by what the developer wrote down.
 
-<SUBAGENT-STOP>
-If you were dispatched as a subagent to execute a specific task, skip this skill.
-</SUBAGENT-STOP>
+The contract: the developer articulates a problem definition, decomposes it into atomic units (TFs), signs off on per-TF expected behavior (quiz), and only then is implementation invited.
 
-<EXTREMELY-IMPORTANT>
-If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+## Single entry
 
-IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+`/humanpowers`. The dispatcher detects whether a workspace exists at or above cwd and routes accordingly.
 
-This is not negotiable. This is not optional. You cannot rationalize your way out of this.
-</EXTREMELY-IMPORTANT>
+- No workspace → create `.humanpowers/` skeleton, hand off to brainstorming.
+- Workspace exists → read phase, route to next skill.
 
-## Instruction Priority
+The dispatcher determines workspace location from cwd context. cwd inside a git repo → `.humanpowers/` lives at repo root. cwd outside a git repo → `.humanpowers/` lives at cwd.
 
-Humanpowers skills override default system prompt behavior, but **user instructions always take precedence**:
+## Workflow
 
-1. **User's explicit instructions** (CLAUDE.md, GEMINI.md, AGENTS.md, direct requests) — highest priority
-2. **Humanpowers skills** — override default system behavior where they conflict
-3. **Default system prompt** — lowest priority
-
-If CLAUDE.md, GEMINI.md, or AGENTS.md says "don't use TDD" and a skill says "always use TDD," follow the user's instructions. The user is in control.
-
-## How to Access Skills
-
-**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
-
-**In Copilot CLI:** Use the `skill` tool. Skills are auto-discovered from installed plugins. The `skill` tool works the same as Claude Code's `Skill` tool.
-
-**In Gemini CLI:** Skills activate via the `activate_skill` tool. Gemini loads skill metadata at session start and activates the full content on demand.
-
-**In other environments:** Check your platform's documentation for how skills are loaded.
-
-## Platform Adaptation
-
-Skills use Claude Code tool names. Non-CC platforms: see `references/copilot-tools.md` (Copilot CLI), `references/codex-tools.md` (Codex) for tool equivalents. Gemini CLI users get the tool mapping loaded automatically via GEMINI.md.
-
-# Using Skills
-
-## The Rule
-
-**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
-
-```dot
-digraph skill_flow {
-    "User message received" [shape=doublecircle];
-    "About to EnterPlanMode?" [shape=doublecircle];
-    "Already brainstormed?" [shape=diamond];
-    "Invoke brainstorming skill" [shape=box];
-    "Might any skill apply?" [shape=diamond];
-    "Invoke Skill tool" [shape=box];
-    "Announce: 'Using [skill] to [purpose]'" [shape=box];
-    "Has checklist?" [shape=diamond];
-    "Create TodoWrite todo per item" [shape=box];
-    "Follow skill exactly" [shape=box];
-    "Respond (including clarifications)" [shape=doublecircle];
-
-    "About to EnterPlanMode?" -> "Already brainstormed?";
-    "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
-    "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
-    "Invoke brainstorming skill" -> "Might any skill apply?";
-
-    "User message received" -> "Might any skill apply?";
-    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
-    "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
-    "Invoke Skill tool" -> "Announce: 'Using [skill] to [purpose]'";
-    "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
-    "Has checklist?" -> "Create TodoWrite todo per item" [label="yes"];
-    "Has checklist?" -> "Follow skill exactly" [label="no"];
-    "Create TodoWrite todo per item" -> "Follow skill exactly";
-}
+```
+brainstorm → quiz → plan → operate → verify → review → finish
 ```
 
-## Red Flags
+- **brainstorm** — produce `problem.md` (what / why / success criteria / out-of-scope / open Qs / preliminary TF outline)
+- **quiz** — drill expected behavior per TF; output is the test spec
+- **plan** — finalize TFs in `tfs.md` with action_type and depends_on; per-TF `plan.md`
+- **operate** — implement per TF; TDD where applicable
+- **verify** — per-TF acceptance demo
+- **review** — cross-TF cascade decisions
+- **finish** — version bump and release
 
-These thoughts mean STOP—you're rationalizing:
+## Subcommands
 
-| Thought | Reality |
-|---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
-| "Let me gather information first" | Skills tell you HOW to gather information. |
-| "This doesn't need a formal skill" | If a skill exists, use it. |
-| "I remember this skill" | Skills evolve. Read current version. |
-| "This doesn't count as a task" | Action = task. Check for skills. |
-| "The skill is overkill" | Simple things become complex. Use it. |
-| "I'll just do this one thing first" | Check BEFORE doing anything. |
-| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
-| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+| Command | Action |
+|---------|--------|
+| `/humanpowers continue` | resume current phase |
+| `/humanpowers jump <phase>` | jump to phase, warn if skipping a gate |
+| `/humanpowers operate <TF-id>` | work on one TF |
+| `/humanpowers review` | cross-TF review |
+| `/humanpowers abort` | mark workspace aborted |
 
-## Skill Priority
+## When NOT to use humanpowers
 
-When multiple skills could apply, use this order:
+humanpowers is design-first. For work that does not warrant a design phase — single-line config edits, emergency hotfixes, pure debugging, or pure code review — invoke superpowers skills directly:
 
-1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
-2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
+- `superpowers:systematic-debugging` for any bug or test failure
+- `superpowers:requesting-code-review` for code review on existing changes
+- `superpowers:test-driven-development` for adding tests to existing code
 
-"Let's build X" → brainstorming first, then implementation skills.
-"Fix this bug" → debugging first, then domain-specific skills.
+humanpowers does not wrap or block these flows.
 
-## Skill Types
+## Skill access
 
-**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.
+Skills are listed in the system reminder. Invoke via the `Skill` tool with the fully qualified name `humanpowers:<skill-name>`.
 
-**Flexible** (patterns): Adapt principles to context.
-
-The skill itself tells you which.
-
-## User Instructions
-
-Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
+When the developer types `/<skill-name>`, the platform resolves it to the corresponding Skill invocation. Do not guess skill names.
