@@ -9,7 +9,7 @@ When creating new skills FOR humanpowers projects, follow these conventions:
 
 1. Skill name lowercase, no `humanpowers-` prefix needed (plugin namespace handled by manifest)
 2. Description should reference humanpowers context if applicable (e.g., "Use after humanpowers:brainstorming when...")
-3. For TF-related skills, take `TF-id` as primary input
+3. For task-related skills, take `task-id` as primary input
 4. Always reference workspace path `~/humanpowers/{project}/...`
 
 # Writing Skills
@@ -108,7 +108,7 @@ skills/
 - `description`: Third-person, describes ONLY when to use (NOT what it does)
   - Start with "Use when..." to focus on triggering conditions
   - Include specific symptoms, situations, and contexts
-  - **NEVER summarize the skill's process or workflow** (see CSO section for why)
+  - **NEVER summarize the skill's process or workflow** (see Claude Search Optimization section for why)
   - Keep under 500 characters if possible
 
 ```markdown
@@ -146,7 +146,7 @@ Concrete results
 ```
 
 
-## Claude Search Optimization (CSO)
+## Claude Search Optimization
 
 **Critical for discovery:** Future Claude needs to FIND your skill
 
@@ -531,7 +531,7 @@ Make it easy for agents to self-check when rationalizing:
 **All of these mean: Delete code. Start over with TDD.**
 ```
 
-### Update CSO for Violation Symptoms
+### Update Claude Search Optimization for Violation Symptoms
 
 Add to description: symptoms of when you're ABOUT to violate the rule:
 

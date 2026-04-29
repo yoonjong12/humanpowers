@@ -27,11 +27,11 @@ digraph when_to_use {
     "Tasks mostly independent?" -> "Stay in this session?" [label="yes"];
     "Tasks mostly independent?" -> "Manual execution or brainstorm first" [label="no - tightly coupled"];
     "Stay in this session?" -> "subagent-driven-development" [label="yes"];
-    "Stay in this session?" -> "executing-plans" [label="no - parallel session"];
+    "Stay in this session?" -> "humanpowers:operate --batch" [label="no - batch execution"];
 }
 ```
 
-**vs. Executing Plans (parallel session):**
+**vs. operate --batch (batch execution):**
 - Same session (no context switch)
 - Fresh subagent per task (no context pollution)
 - Two-stage review after each task: spec compliance first, then code quality
@@ -128,7 +128,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 ```
 You: I'm using Subagent-Driven Development to execute this plan.
 
-[Read plan file once: ~/humanpowers/{project}/tfs/{TF-id}/build-plan.md]
+[Read plan file once: ~/humanpowers/{project}/tasks/{task-id}/build-plan.md]
 [Extract all 5 tasks with full text and context]
 [Create TodoWrite with all tasks]
 
@@ -207,7 +207,7 @@ Done!
 - Parallel-safe (subagents don't interfere)
 - Subagent can ask questions (before AND during work)
 
-**vs. Executing Plans:**
+**vs. operate --batch:**
 - Same session (no handoff)
 - Continuous progress (no waiting)
 - Review checkpoints automatic
@@ -274,18 +274,18 @@ Done!
 - **humanpowers:test-driven-development** - Subagents follow TDD for each task
 
 **Alternative workflow:**
-- **humanpowers:executing-plans** - Use for parallel session instead of same-session execution
+- **humanpowers:operate --batch** - Use for batch execution instead of same-session execution
 
-## humanpowers TF Lead Pattern
+## humanpowers Task Lead Pattern
 
-In humanpowers, subagents play the role of TF Lead — ad-hoc per TF, no fixed domain identity.
+In humanpowers, subagents play the role of task lead — ad-hoc per task, no fixed domain identity.
 
 **Dispatch convention**:
-- Pass `TF-id` as primary context
-- Subagent reads: `tfs.md#TF-{id}`, `tfs/{id}/expected-outputs.md`, `tfs/{id}/build-plan.md`
-- Subagent acts within scope of that TF only
-- Same human/agent can lead different TFs (no role attachment)
+- Pass `task-id` as primary context
+- Subagent reads: `tasks.md#{task-id}`, `tasks/{id}/expected-outputs.md`, `tasks/{id}/build-plan.md`
+- Subagent acts within scope of that task only
+- Same human/agent can lead different tasks (no role attachment)
 
 **Memory**:
-- Per-TF scratchpad at `library/scratchpads/TF-{id}.md` (≤30 lines, auto-truncated by hook)
+- Per-task scratchpad at `library/scratchpads/{task-id}.md` (≤30 lines, auto-truncated by hook)
 - NOT in `~/.claude/projects/.../memory/` (that's claude-code's per-project memory)
