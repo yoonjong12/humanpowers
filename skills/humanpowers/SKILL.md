@@ -1,6 +1,6 @@
 ---
 name: humanpowers
-description: Single entry point for humanpowers. Detects cwd context (in-repo or external), creates .humanpowers/ workspace skeleton when absent, then routes by phase. Developer types `/humanpowers` (optionally with a Subcommand) and the dispatcher determines the next skill. Use whenever the developer wants to start or resume design-first work.
+description: Single entry point for humanpowers. Detects cwd context (in-repo or external), creates .humanpowers/ workspace skeleton when absent, then routes by phase. Developer types `/humanpowers` (optionally with a subcommand) and the dispatcher determines the next skill. Use whenever the developer wants to start or resume design-first work.
 ---
 
 # humanpowers Dispatcher
@@ -12,12 +12,11 @@ Single entry to humanpowers. Two responsibilities:
 1. **Workspace structure** — locate or create `.humanpowers/` and seed `state.json`.
 2. **Phase routing** — read `state.json` and hand off to the next skill.
 
-The dispatcher does not author content. brainstorming owns problem definition; quiz / writing-plans / operate / verification / review own per-TF work.
+The dispatcher does not author content. brainstorming owns problem definition; quiz / writing-plans / operate / verification / review own per-task work.
 
 ## Step 1: Locate workspace
 
 ```bash
-# Search upward from cwd for .humanpowers/state.json (closest wins)
 WS=""
 DIR="$(pwd)"
 while [ "$DIR" != "/" ]; do
@@ -36,7 +35,6 @@ If `WS` is empty → no workspace, go to Step 2.
 ## Step 2: Create workspace skeleton
 
 ```bash
-# Decide workspace_kind and target_repo from cwd context
 if git rev-parse --show-toplevel >/dev/null 2>&1; then
   REPO_ROOT="$(git rev-parse --show-toplevel)"
   WS_DIR="$REPO_ROOT/.humanpowers"
@@ -48,9 +46,8 @@ else
   TARGET="null"
 fi
 
-mkdir -p "$WS_DIR/tfs" "$WS_DIR/views" "$WS_DIR/shelves"
+mkdir -p "$WS_DIR/tasks"
 
-# Seed state.json from template (target_repo as JSON null when external)
 if [ "$TARGET" = "null" ]; then
   TARGET_JSON="null"
 else
@@ -62,10 +59,10 @@ cat > "$WS_DIR/state.json" <<EOF
   "phase": "",
   "target_repo": $TARGET_JSON,
   "workspace_kind": "$KIND",
-  "tfs_total": 0,
-  "tfs_quiz_done": 0,
-  "tfs_built": 0,
-  "tfs_verified": 0
+  "tasks_total": 0,
+  "tasks_quiz_done": 0,
+  "tasks_built": 0,
+  "tasks_verified": 0
 }
 EOF
 ```
@@ -77,10 +74,13 @@ Workspace created: <WS_DIR>
 workspace_kind: <KIND>
 target_repo: <TARGET>
 
+Note: this workspace is local-only. The repo's .gitignore excludes .humanpowers/ entirely.
+The decision artifact is created at the finish phase as docs/decisions/<slug>.md and committed.
+
 Invoking humanpowers:brainstorming to define the problem.
 ```
 
-Hand off to `humanpowers:brainstorming`. brainstorming will produce `problem.md` and set `phase = problem-defined`.
+Hand off to `humanpowers:brainstorming`.
 
 ## Step 3: Existing workspace — validate + route
 
@@ -99,20 +99,20 @@ Route:
 | `""` (empty) | humanpowers:brainstorming |
 | `problem-defined` | humanpowers:quiz |
 | `quiz-done` | humanpowers:writing-plans |
-| `planned` | humanpowers:operate (per remaining TF) |
+| `planned` | humanpowers:operate (per remaining task; supports `--batch`) |
 | `built` | humanpowers:verification-before-completion |
-| `verified` (some TFs) | humanpowers:review or humanpowers:operate (next TF) |
-| `verified` (all TFs) | humanpowers:finishing-a-development-branch |
+| `verified` (some tasks) | humanpowers:review or humanpowers:operate (next task) |
+| `verified` (all tasks) | humanpowers:finishing-a-development-branch |
 
 Echo current state before routing:
 
 ```
 Workspace: <WS>
 Phase: <PHASE>
-TFs: <verified>/<total> verified, <built>/<total> built, <quiz_done>/<total> quiz-done
+Tasks: <verified>/<total> verified, <built>/<total> built, <quiz_done>/<total> quiz-done
 ```
 
-If a Subcommand was passed (e.g., `/humanpowers jump quiz`), apply the override after the echo.
+If a subcommand was passed, apply the override after the echo.
 
 ## Step 4: Subcommands
 
@@ -120,8 +120,9 @@ If a Subcommand was passed (e.g., `/humanpowers jump quiz`), apply the override 
 |---------|--------|
 | `/humanpowers continue` | resume current phase (default behavior) |
 | `/humanpowers jump <phase>` | force jump to phase; warn if skipping a gate |
-| `/humanpowers operate <TF-id>` | invoke humanpowers:operate with a specific TF |
-| `/humanpowers review` | invoke humanpowers:review for cross-TF cascade |
+| `/humanpowers operate <task-id>` | invoke humanpowers:operate with a specific task |
+| `/humanpowers operate --batch` | invoke humanpowers:operate over all remaining unbuilt tasks |
+| `/humanpowers review` | invoke humanpowers:review for cross-task cascade |
 | `/humanpowers abort` | mark workspace aborted in state.json + stop |
 
 `abort` sets `phase = "aborted"` via `scripts/update-state.sh "$WS" phase aborted`.
@@ -130,6 +131,6 @@ If a Subcommand was passed (e.g., `/humanpowers jump quiz`), apply the override 
 
 Skills downstream of the dispatcher must:
 
-- Read workspace location from cwd or upward search (same logic as Step 1). Do NOT hard-code a fixed home-relative path.
+- Read workspace location via upward search from cwd (same logic as Step 1). Do not hard-code a fixed home-relative path.
 - Read `target_repo` from `state.json` when they need the code repo (operate, verification, finishing).
 - Update phase via `scripts/update-state.sh` rather than manual jq edits.
