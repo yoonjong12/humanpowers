@@ -1,6 +1,6 @@
 ---
 name: using-humanpowers
-description: Use when starting any conversation in a humanpowers context — establishes how to find and use humanpowers skills and the problem-first workflow. Auto-loads at session start when humanpowers plugin is active.
+description: Use when starting any conversation in a humanpowers context — establishes how to find and use humanpowers skills, the problem-first workflow, and the local-only privacy model. Auto-loads at session start when humanpowers plugin is active.
 ---
 
 # Using humanpowers
@@ -9,7 +9,13 @@ description: Use when starting any conversation in a humanpowers context — est
 
 A Claude Code plugin that structures the developer's design work as the load-bearing element of AI-assisted development. The agent is a structured executor bounded by what the developer wrote down.
 
-The contract: the developer articulates a problem definition, decomposes it into atomic units (TFs), signs off on per-TF expected behavior (quiz), and only then is implementation invited.
+The contract: the developer articulates a problem definition, decomposes it into atomic tasks, signs off on per-task expected behavior (quiz), and only then is implementation invited.
+
+## Privacy model
+
+humanpowers workspaces are local-only. The repo's `.gitignore` excludes the entire `.humanpowers/` directory. Working artifacts (problem.md, tasks.md, per-task quiz / plan / verify, etc.) live on the developer's machine and never enter PRs or main branches.
+
+The decision artifact is created at the `finish` phase as `docs/decisions/<slug>.md` and committed. This file is the single durable record of the design — its rationale, key decisions, alternatives considered, and verify outcomes.
 
 ## Single entry
 
@@ -26,13 +32,13 @@ The dispatcher determines workspace location from cwd context. cwd inside a git 
 brainstorm → quiz → plan → operate → verify → review → finish
 ```
 
-- **brainstorm** — produce `problem.md` (what / why / success criteria / out-of-scope / open Qs / preliminary TF outline)
-- **quiz** — drill expected behavior per TF; output is the test spec
-- **plan** — finalize TFs in `tfs.md` with action_type and depends_on; per-TF `plan.md`
-- **operate** — implement per TF; TDD where applicable
-- **verify** — per-TF acceptance demo
-- **review** — cross-TF cascade decisions
-- **finish** — version bump and release
+- **brainstorm** — produce `problem.md` (what / why / success criteria / project invariants / out-of-scope / open Qs / preliminary task outline)
+- **quiz** — drill expected behavior per task; round 1 mandatory (agent-led), round 2 optional (developer-led); output is the test spec
+- **plan** — finalize tasks in `tasks.md` with action_type and depends_on; per-task `plan.md`
+- **operate** — implement per task (TDD); `--batch` mode iterates all remaining unbuilt tasks
+- **verify** — per-task acceptance demo
+- **review** — cross-task cascade decisions
+- **finish** — write `docs/decisions/<slug>.md` ADR digest, commit, optionally bump version
 
 ## Subcommands
 
@@ -40,8 +46,9 @@ brainstorm → quiz → plan → operate → verify → review → finish
 |---------|--------|
 | `/humanpowers continue` | resume current phase |
 | `/humanpowers jump <phase>` | jump to phase, warn if skipping a gate |
-| `/humanpowers operate <TF-id>` | work on one TF |
-| `/humanpowers review` | cross-TF review |
+| `/humanpowers operate <task-id>` | work on one task |
+| `/humanpowers operate --batch` | work on all remaining unbuilt tasks |
+| `/humanpowers review` | cross-task review |
 | `/humanpowers abort` | mark workspace aborted |
 
 ## When NOT to use humanpowers
