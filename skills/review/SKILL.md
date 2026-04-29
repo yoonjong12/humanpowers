@@ -1,13 +1,13 @@
 ---
 name: review
-description: Use after multiple TFs are verified to perform developer review of the project state, optionally bump developer.md version, and identify next priorities. Distinct from per-TF verification (which is humanpowers:verification-before-completion). This is project-level review with cascade decisions.
+description: Use after multiple tasks are verified to perform developer review of the project state, optionally bump developer.md version, and identify next priorities. Distinct from per-task verification (which is humanpowers:verification-before-completion). This is project-level review with cascade decisions.
 ---
 
 # Review Skill
 
 ## When to invoke
 
-- After at least 2 TFs reach `status: verified`
+- After at least 2 tasks reach `status: verified`
 - Or developer explicitly requests `/humanpowers review`
 - Before finishing-a-development-branch (final wrap)
 
@@ -29,7 +29,7 @@ Display:
 Project: {name}
 Version: {developer.md version}
 
-TFs: {N total}
+Tasks: {N total}
   problem-defined: {x}
   quiz-done: {x}
   designed: {x}
@@ -39,34 +39,34 @@ TFs: {N total}
 Open threads: {count}
 Resolved threads: {count}
 
-Boss invariant violations (auto-detect): {none | list}
+project invariant violations (auto-detect): {none | list}
 ```
 
-Pull invariant violations by scanning recent commits + tfs.md changes.
+Pull invariant violations by scanning recent commits + tasks.md changes.
 
 ### Step 3: AUQ — review options
 
 ```
 Q: 프로젝트 review 결과. 다음 액션?
 options:
-  - 1. 다음 TF 우선순위 결정 (continue building)
+  - 1. 다음 task 우선순위 결정 (continue building)
   - 2. developer.md version bump (minor/major)
-  - 3. Cascade — 특정 TF expected-outputs 재검토 (re-quiz)
+  - 3. Cascade — 특정 task expected-outputs 재검토 (re-quiz)
   - 4. Open threads 처리 (developer reviews threads)
   - 5. Finalize (humanpowers:finishing-a-development-branch)
 ```
 
 ### Step 4a: Option 1 — Priority decision
 
-Compute `depends_on` frontier — TFs whose deps are verified.
+Compute `depends_on` frontier — tasks whose deps are verified.
 
 AUQ:
 ```
-Q: 다음 TF 후보 (frontier): TF-X / TF-Y / TF-Z. 어디 우선?
-options: [TF-X, TF-Y, TF-Z, parallel-all, custom]
+Q: 다음 task 후보 (frontier): task-X / task-Y / task-Z. 어디 우선?
+options: [task-X, task-Y, task-Z, parallel-all, custom]
 ```
 
-Hand off: `/humanpowers operate {chosen-TF}`.
+Hand off: `/humanpowers operate {chosen-task}`.
 
 ### Step 4b: Option 2 — Version bump
 
@@ -74,8 +74,8 @@ AUQ:
 ```
 Q: 버전 bump 종류?
 options:
-  - minor (X.Y → X.Y+1) — TF 추가 / 비-구조 edit
-  - major (X.Y → X+1.0) — 매트릭스 구조 pivot / TF 제거
+  - minor (X.Y → X.Y+1) — task 추가 / 비-구조 edit
+  - major (X.Y → X+1.0) — 매트릭스 구조 pivot / task 제거
 ```
 
 Edit developer.md frontmatter version. Commit + tag git.
@@ -84,11 +84,11 @@ Edit developer.md frontmatter version. Commit + tag git.
 
 AUQ:
 ```
-Q: 어느 TF 의 expected-outputs 재검토?
-free text: TF-id
+Q: 어느 task 의 expected-outputs 재검토?
+free text: task-id
 ```
 
-Reset that TF's `status: problem-defined`. Hand off to humanpowers:quiz.
+Reset that task's `status: problem-defined`. Hand off to humanpowers:quiz.
 
 ### Step 4d: Option 4 — Threads
 
