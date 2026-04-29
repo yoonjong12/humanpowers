@@ -7,7 +7,7 @@
     {
       "name": "humanpowers",
       "source": "./",
-      "description": "Boss-articulation enforcement plugin. Forces lazy boss into design/quiz/verification dialogue. Forked from superpowers with TF model + matrix views + Quiz module."
+      "description": "humanpowers structures the developer's design work as the load-bearing element of AI-assisted development. Problem-first workflow with TF decomposition, per-TF quiz, plan, operate, verify, review, finish."
     }
   ]
 }
