@@ -13,6 +13,85 @@ Guide completion of development work by presenting clear options and handling ch
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
+## ADR digest at finish
+
+humanpowers workspaces are local-only. The decision artifact is the only thing the plugin commits to the repo. At finish time, this skill writes `docs/decisions/<slug>.md` summarizing the design.
+
+### Step 1: Confirm all tasks verified
+
+Read `<workspace>/.humanpowers/state.json`. Confirm `tasks_verified == tasks_total`. If not, error: "Not all tasks verified. Cannot write ADR." and stop.
+
+### Step 2: Ask the developer for a slug
+
+Ask one question via AskUserQuestion: "What's the slug for this feature?" — short kebab-case identifier (e.g., `pcr-curator-review-injection`). The slug becomes the ADR filename.
+
+### Step 3: Read source artifacts
+
+Read in order:
+- `<workspace>/.humanpowers/problem.md` (for problem summary, project invariants)
+- `<workspace>/.humanpowers/tasks.md` (for task list, action_types, depends_on)
+- For each task `{id}`: `<workspace>/.humanpowers/tasks/{id}/round1.md`, `round2.md` if present, `plan.md`, `verify.md`
+
+### Step 4: Write ADR
+
+Write to `<target_repo>/docs/decisions/<slug>.md` (create directory if absent):
+
+```markdown
+# <feature title from problem.md "What" section>
+
+## Status
+
+Accepted
+
+## Problem
+
+<one-paragraph summary derived from problem.md "What" + "Why">
+
+## Project invariants
+
+<bulleted list copied from problem.md "Project invariants" section>
+
+## Decisions
+
+<for each task, one or two sentences summarizing the key decisions made. Reference the file paths the task touched. Format:>
+
+### Task <id>: <task name>
+
+<key decisions from quiz round 1 + round 2 if present, plus any plan-level choices>. Touches: `<paths>`.
+
+## Alternatives considered
+
+<bullets surfaced during brainstorming or quiz round 2 — explicit alternatives the developer rejected>
+
+## Consequences
+
+<what changed in the repo, what is now possible, what new constraints exist>
+
+## Verify outcomes
+
+<for each task, one line: what was verified and how — test pass, demo signoff, etc.>
+```
+
+### Step 5: Commit ADR
+
+```bash
+cd <target_repo>
+git add docs/decisions/<slug>.md
+git commit -m "design: <feature title>"
+```
+
+### Step 6: Optionally bump version + release
+
+If the project uses semver and the developer wants a release, prompt for `major / minor / patch` and run the project's release flow (out of scope for humanpowers; the developer's existing release process applies).
+
+### Step 7: Update workspace phase
+
+```bash
+bash scripts/update-state.sh "$WS" phase finished
+```
+
+The workspace remains local. The developer can delete `.humanpowers/` at this point if they don't need to resume; the ADR is the durable record.
+
 ## The Process
 
 ### Step 1: Verify Tests
@@ -194,11 +273,11 @@ git worktree remove <worktree-path>
 
 Before merge/PR/cleanup:
 
-1. Verify ALL TFs in `tfs.md` have `status: verified`. If any not verified, halt.
+1. Verify ALL tasks in `tasks.md` have `status: verified`. If any not verified, halt.
 2. Run `scripts/render-views.sh` — final views/*.md updated.
 3. Show developer the `views/progress.md` matrix — all checkboxes filled.
-4. Boss explicit signoff via AskUserQuestion:
-   - "All TFs verified. Ready to finalize? PASS / HOLD / ABORT"
+4. Developer explicit signoff via AskUserQuestion:
+   - "All tasks verified. Ready to finalize? PASS / HOLD / ABORT"
 5. PASS → bump `developer.md` version (e.g., v1.0 → v1.1 minor or v2.0 major if pivot occurred).
 6. Commit + tag git.
 
@@ -206,19 +285,19 @@ Before merge/PR/cleanup:
 
 Locate `developer.md` header `version: vX.Y`.
 
-- **Minor (X.Y → X.Y+1)**: TF additions, non-structural edits, NFR additions.
-- **Major (X.Y → X+1.0)**: Matrix structure pivot (e.g., concern/action_type changes), TF removal, persona change.
+- **Minor (X.Y → X.Y+1)**: task additions, non-structural edits, NFR additions.
+- **Major (X.Y → X+1.0)**: Matrix structure pivot (e.g., concern/action_type changes), task removal, persona change.
 
 Edit `developer.md` first line:
 
 ```yaml
-version: v1.1 (2026-04-28, added TF-3d image search)
+version: v1.1 (2026-04-28, added Task 3d image search)
 ```
 
 Commit:
 
 ```bash
-git commit -m "release: humanpowers project v1.1 - TF-3d added"
+git commit -m "release: humanpowers project v1.1 - Task 3d added"
 git tag v1.1
 ```
 
