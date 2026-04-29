@@ -2,13 +2,13 @@
 
 > Status: signed_off
 > action_type: api
-> Boss articulation: 6 questions / 22 turns
+> Developer articulation: 6 questions / 22 turns
 
 ## Q1: Request shape
 
 POST /api/resource — accepted body shape?
 
-**Boss answer**:
+**Developer answer**:
 ```json
 {
   "name": "string, 1-100 chars, required",
@@ -28,7 +28,7 @@ Content-Type: application/json. Other = 415.
 
 201 Created body?
 
-**Boss answer**:
+**Developer answer**:
 ```json
 {
   "id": "uuid v4",
@@ -45,7 +45,7 @@ Header: `Location: /api/resource/{id}`.
 
 4xx body shape?
 
-**Boss answer**:
+**Developer answer**:
 ```json
 {
   "error": {
@@ -62,7 +62,7 @@ Header: `Location: /api/resource/{id}`.
 
 Required?
 
-**Boss answer**:
+**Developer answer**:
 - Bearer token in Authorization header
 - Token = JWT signed with HS256
 - Token expiry 1 hour
@@ -70,7 +70,7 @@ Required?
 
 ## Q5: Rate limit
 
-**Boss answer**:
+**Developer answer**:
 - 100 req/min per user
 - 429 response with `Retry-After: {seconds}` header
 - Body = standard error shape with `code: RATE_LIMITED`
@@ -79,7 +79,7 @@ Required?
 
 Same request, retry-safe?
 
-**Boss answer**:
+**Developer answer**:
 - Optional `Idempotency-Key` header (UUID)
 - Same key + same body within 24h = return original response
 - Same key + different body = 409 conflict

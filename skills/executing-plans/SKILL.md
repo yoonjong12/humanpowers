@@ -42,8 +42,8 @@ After each TF Task completes, agent MUST:
 
 1. Update `tfs/{TF-id}/build-plan.md` task checkbox to `[x]`.
 2. Update `tfs.md` row status if appropriate.
-3. **Optional boss demo**: If task is "user-visible" (creates UI element / API endpoint / data), offer boss a mini-demo. Boss can skip.
-4. After ALL tasks in a TF complete, INVOKE humanpowers:verification-before-completion → mandatory boss demo signoff.
+3. **Optional developer demo**: If task is "user-visible" (creates UI element / API endpoint / data), offer developer a mini-demo. Developer can skip.
+4. After ALL tasks in a TF complete, INVOKE humanpowers:verification-before-completion → mandatory developer demo signoff.
 
 Skipping mandatory signoff = TF stays at `status: built`, NOT `verified`.
 

@@ -9,7 +9,7 @@
 
 {question body — what must be decided}
 
-**Boss answer**:
+**Developer answer**:
 <!-- 자유 기술. 한 줄도 OK. 빈 칸도 OK (agent 가 한 번 더 물어봄). -->
 
 
@@ -18,7 +18,7 @@
 
 
 **Test spec (auto-derived)**:
-<!-- after lock, agent fills. boss answer → executable test -->
+<!-- after lock, agent fills. developer answer → executable test -->
 
 
 ---

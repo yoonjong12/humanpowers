@@ -7,7 +7,7 @@
 
 Daily aggregation job: input = events table, output = daily_metrics. What exactly?
 
-**Boss answer**:
+**Developer answer**:
 - Input: `events(timestamp UTC, user_id, event_type, value DECIMAL)`
 - Output: `daily_metrics(date DATE, event_type, count INT, sum_value DECIMAL, distinct_users INT)`
 - Partitioning: input by HOUR (24 partitions/day), aggregate scans only previous day's partitions
@@ -31,7 +31,7 @@ SELECT sum_value FROM daily_metrics WHERE date = '2026-04-27' AND event_type = '
 
 Events with timestamp = 2026-04-27 arriving after job ran?
 
-**Boss answer**:
+**Developer answer**:
 - Re-run job with `--reprocess-date 2026-04-27` flag (manual trigger)
 - Auto-detect window: 7 days lookback nightly job re-aggregates
 - Late arrivals after 7d = ignored, logged to `late_events_orphan` table
@@ -40,7 +40,7 @@ Events with timestamp = 2026-04-27 arriving after job ran?
 
 Re-run for same date — overwrites or appends?
 
-**Boss answer**:
+**Developer answer**:
 - Overwrite (UPSERT). Source of truth = always latest run.
 - Audit log captures every run with run_id + duration + rows_processed.
 
@@ -48,7 +48,7 @@ Re-run for same date — overwrites or appends?
 
 Job fails midway?
 
-**Boss answer**:
+**Developer answer**:
 - Transaction rollback (no partial daily_metrics rows for that date)
 - Re-trigger via runbook (scripts/rerun-aggregation.sh)
 - Alert sent if not retried within 4 hours

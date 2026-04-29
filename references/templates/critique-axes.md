@@ -1,6 +1,6 @@
 # Critique 4 Axes (Agent Internal Checklist)
 
-Use this when reading boss's quiz answer. Check each axis. ANY hit = additional critique.
+Use this when reading developer's quiz answer. Check each axis. ANY hit = additional critique.
 
 ## Axis 1 — Vagueness (모호)
 
@@ -13,7 +13,7 @@ Use this when reading boss's quiz answer. Check each axis. ANY hit = additional 
 
 - TF spec NFR (Layer 1) 와 모순
 - 다른 TF 답안 (다른 expected-outputs.md) 와 모순
-- boss.md 불변식 (Layer 0) 위반
+- problem.md 불변식 (Layer 0) 위반
 
 ## Axis 3 — Completeness (완결성)
 

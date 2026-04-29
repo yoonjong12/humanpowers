@@ -1,4 +1,4 @@
-# {TF-id} — Boss Response (D1, mandatory)
+# {TF-id} — Developer Response (D1, mandatory)
 
 > Linked quiz: quiz.md
 > action_type: ...

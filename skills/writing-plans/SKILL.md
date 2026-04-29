@@ -50,7 +50,7 @@ This structure informs the task decomposition. Each task should produce self-con
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use humanpowers:subagent-driven-development (recommended) or humanpowers:operate to drive this TF plan task-by-task. Each TF gates pre-build (boss confirm) + post-build (humanpowers:verification-before-completion). Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use humanpowers:subagent-driven-development (recommended) or humanpowers:operate to drive this TF plan task-by-task. Each TF gates pre-build (developer confirm) + post-build (humanpowers:verification-before-completion). Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -116,7 +116,7 @@ Each TF gets its own plan section:
   **Spec source**: `tfs.md#TF-1a`
   **VERIFY (signed_off)**: `tfs/TF-1a/expected-outputs.md`
   **depends_on**: []
-  **Boss confirm gate**: REQUIRED before Task 1 of this TF begins.
+  **Developer confirm gate**: REQUIRED before Task 1 of this TF begins.
 
   ### Task 1: ...
   ### Task 2: ...
@@ -124,15 +124,15 @@ Each TF gets its own plan section:
 
 After all tasks for a TF complete, mark `status: built` in `tfs.md`. Run humanpowers:verification-before-completion before next TF.
 
-### Boss Confirm Gates (humanpowers principle)
+### Developer Confirm Gates (humanpowers principle)
 
 Each TF plan MUST have:
 
-1. **Pre-build gate**: Boss confirms TF spec + expected-outputs are signed_off. If not, abort and re-run quiz.
-2. **Mid-build checkpoints**: After each Task in TF, boss has option to inspect (not required, but available).
-3. **Post-build gate**: Run humanpowers:verification-before-completion → boss demo signoff. NO code-pass-only completion.
+1. **Pre-build gate**: Developer confirms TF spec + expected-outputs are signed_off. If not, abort and re-run quiz.
+2. **Mid-build checkpoints**: After each Task in TF, developer has option to inspect (not required, but available).
+3. **Post-build gate**: Run humanpowers:verification-before-completion → developer demo signoff. NO code-pass-only completion.
 
-Gates are explicit. AI does NOT proceed past gate without boss action.
+Gates are explicit. AI does NOT proceed past gate without developer action.
 
 ## Build Order from depends_on
 
@@ -140,7 +140,7 @@ Read `tfs.md`. Compute topological order from `depends_on` field:
 
 1. TFs with `depends_on: []` → can start immediately, parallel-eligible.
 2. TFs with deps → wait until all deps `status: verified`.
-3. Cycle in deps = abort, ask boss to break cycle.
+3. Cycle in deps = abort, ask developer to break cycle.
 
 Use humanpowers:dispatching-parallel-agents for parallel-eligible TFs.
 
@@ -174,11 +174,11 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 ## Execution Handoff
 
-After saving the per-TF plan, run boss confirm gate, then route to humanpowers:operate.
+After saving the per-TF plan, run developer confirm gate, then route to humanpowers:operate.
 
 **"Plan complete and saved to `~/humanpowers/{project-name}/tfs/{TF-id}/build-plan.md`.**
 
-**Pre-build gate (REQUIRED):** Boss confirms TF spec + expected-outputs are signed_off in `tfs.md`. If not signed_off → abort, re-run humanpowers:quiz for this TF.
+**Pre-build gate (REQUIRED):** Developer confirms TF spec + expected-outputs are signed_off in `tfs.md`. If not signed_off → abort, re-run humanpowers:quiz for this TF.
 
 **Build path options (after gate passes):**
 
@@ -192,7 +192,7 @@ After saving the per-TF plan, run boss confirm gate, then route to humanpowers:o
 
 **If Subagent-Driven chosen:**
 - **REQUIRED SUB-SKILL:** humanpowers:subagent-driven-development
-- After all tasks complete → humanpowers:verification-before-completion (post-build gate, boss demo signoff).
+- After all tasks complete → humanpowers:verification-before-completion (post-build gate, developer demo signoff).
 
 **If Inline Execution chosen:**
 - **REQUIRED SUB-SKILL:** humanpowers:operate (drives TF lifecycle: build → verify → mark `status: built`).
@@ -202,4 +202,4 @@ After saving the per-TF plan, run boss confirm gate, then route to humanpowers:o
 - **REQUIRED SUB-SKILL:** humanpowers:dispatching-parallel-agents.
 - Each parallel branch must independently pass humanpowers:verification-before-completion before its TF is marked `status: verified`.
 
-**Terminal state:** humanpowers:verification-before-completion. NO code-pass-only completion. Boss demo signoff required.
+**Terminal state:** humanpowers:verification-before-completion. NO code-pass-only completion. Developer demo signoff required.

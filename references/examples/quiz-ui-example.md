@@ -2,7 +2,7 @@
 
 > Status: signed_off
 > action_type: ui
-> Boss articulation: 5 questions / 18 turns
+> Developer articulation: 5 questions / 18 turns
 > Linked TF spec: tfs.md#TF-{X}
 
 ## Q1: Form submission behavior
@@ -10,7 +10,7 @@
 When user fills form fields F1, F2, F3 and clicks Submit, what exactly happens?
 (Validation order / error display / success indicator / redirect / data persistence)
 
-**Boss answer (final, locked after 3 rounds)**:
+**Developer answer (final, locked after 3 rounds)**:
 - Validation order: F1 → F2 → F3 (top to bottom). Stop at first invalid.
 - Error display: red border on invalid field + tooltip below "Field {name}: {reason}"
 - F1 valid = required + length 1-50
@@ -38,7 +38,7 @@ When user fills form fields F1, F2, F3 and clicks Submit, what exactly happens?
 
 If user fills form, navigates away (back button), returns — should fields persist?
 
-**Boss answer**:
+**Developer answer**:
 - Persist in browser sessionStorage on every keystroke
 - Restore on page load if sessionStorage has entry < 1 hour old
 - Clear sessionStorage on successful submit
@@ -57,7 +57,7 @@ If user fills form, navigates away (back button), returns — should fields pers
 
 What a11y standards must form meet?
 
-**Boss answer**:
+**Developer answer**:
 - WCAG AA contrast (4.5:1)
 - All inputs have <label> associated
 - Error messages = aria-live="polite"
@@ -68,7 +68,7 @@ What a11y standards must form meet?
 
 Layout below viewport 600px wide?
 
-**Boss answer**:
+**Developer answer**:
 - Single column stack
 - Inputs full-width minus 16px padding
 - Submit button = full-width
@@ -78,7 +78,7 @@ Layout below viewport 600px wide?
 
 Initial form load (data fetched async)?
 
-**Boss answer**:
+**Developer answer**:
 - Skeleton placeholder for form fields (3 grey rectangles)
 - Disabled submit until data loaded
 - Loading > 5s = "Loading..." text + spinner

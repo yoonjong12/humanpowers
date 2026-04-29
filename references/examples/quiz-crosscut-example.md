@@ -7,7 +7,7 @@
 
 Which paths must be deterministic (same input → same output)?
 
-**Boss answer**:
+**Developer answer**:
 - All LLM calls in workflow X = temperature 0 + top_p 1
 - All DB queries with sort = explicit ORDER BY (no implicit ordering)
 - All UUID generation in tests = seeded random (e.g., uuid5 with namespace)
@@ -17,7 +17,7 @@ Which paths must be deterministic (same input → same output)?
 
 How does this TF "pass"?
 
-**Boss answer**:
+**Developer answer**:
 - TF-CC = composite — passes when:
   - TF-1a + TF-1b + TF-2a + TF-2b all run their VERIFY 3x in sequence
   - All 3 runs produce identical results (byte-equal for JSON, row-equal for SQL output)
@@ -27,7 +27,7 @@ How does this TF "pass"?
 
 Where determinism MAY relax?
 
-**Boss answer**:
+**Developer answer**:
 - Logging: timestamps OK to differ (don't compare in VERIFY)
 - Trace IDs: random per request OK (don't compare)
 - Cache: if cache miss vs hit changes timing but not value, OK
@@ -36,7 +36,7 @@ Where determinism MAY relax?
 
 How catch non-determinism?
 
-**Boss answer**:
+**Developer answer**:
 - CI runs each impacted TF VERIFY 3x with same seed
 - diff outputs (excluding timestamp/trace_id fields)
 - Any non-empty diff = build fails
