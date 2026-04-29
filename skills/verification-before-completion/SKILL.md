@@ -8,28 +8,28 @@ description: Use when about to claim work is complete, fixed, or passing, before
 ## Core principle (humanpowers replacement of superpowers verification)
 
 **superpowers**: "All tests pass + types check + linter clean = verified."
-**humanpowers**: "Boss watched the demo + signed off = verified. Code passes are necessary but NOT sufficient."
+**humanpowers**: "Developer watched the demo + signed off = verified. Code passes are necessary but NOT sufficient."
 
-VERIFY = signed_off `tfs/{TF-id}/expected-outputs.md` from quiz phase.
+VERIFY = signed_off `tasks/{id}/expected-outputs.md` from quiz phase.
 
 ## Demo form by action_type
 
 | action_type | Demo form for developer |
 |-------------|-------------------|
-| ui | Live click-through following Gherkin scenarios. Boss watches screen, confirms each Then clause. |
-| api | Live cURL execution with response shown. Boss confirms HTTP code + body shape. |
-| data | SQL query execution with row count + sample row dump. Boss confirms expected vs actual. |
-| infra | Checklist walkthrough + health curl. Boss confirms each item. |
-| cross-cutting | Composite — show all impacted TFs' demos pass. Boss confirms aggregate. |
+| ui | Live click-through following Gherkin scenarios. Developer watches screen, confirms each Then clause. |
+| api | Live cURL execution with response shown. Developer confirms HTTP code + body shape. |
+| data | SQL query execution with row count + sample row dump. Developer confirms expected vs actual. |
+| infra | Checklist walkthrough + health curl. Developer confirms each item. |
+| cross-cutting | Composite — show all impacted tasks' demos pass. Developer confirms aggregate. |
 
-Boss WATCHES the demo (or operates it themselves). Agent does NOT run demo silently then say "passed". Boss must SEE the result.
+Developer WATCHES the demo (or operates it themselves). Agent does NOT run demo silently then say "passed". Developer must SEE the result.
 
 ## Signoff process
 
 1. Agent prepares demo per `expected-outputs.md` Q list.
 2. Agent runs demo with developer watching (or developer runs).
 3. For each Q, developer says: PASS / FAIL / NEEDS REWORK.
-4. All Q = PASS → mark TF `status: verified` in `tfs.md`.
+4. All Q = PASS → mark task `status: verified` in `tasks.md`.
 5. Any FAIL → halt, return to writing-plans for re-build.
 6. NEEDS REWORK → return to quiz to re-articulate that Q.
 
