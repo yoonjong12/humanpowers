@@ -15,9 +15,9 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `~/humanpowers/{project-name}/tfs/{TF-id}/build-plan.md`
+**Save plans to:** `~/humanpowers/{project-name}/tasks/{id}/build-plan.md`
 
-One plan file per TF. Cross-TF coordination via `threads/*.md`.
+One plan file per task. Cross-task coordination via `threads/*.md`.
 
 ## Scope Check
 
@@ -50,7 +50,7 @@ This structure informs the task decomposition. Each task should produce self-con
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use humanpowers:subagent-driven-development (recommended) or humanpowers:operate to drive this TF plan task-by-task. Each TF gates pre-build (developer confirm) + post-build (humanpowers:verification-before-completion). Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use humanpowers:subagent-driven-development (recommended) or humanpowers:operate to drive this task plan task-by-task. Each task gates pre-build (developer confirm) + post-build (humanpowers:verification-before-completion). Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -104,45 +104,45 @@ git commit -m "feat: add specific feature"
 ```
 ````
 
-## TF-unit Plan Structure (humanpowers extension)
+## Task-unit Plan Structure (humanpowers extension)
 
-In humanpowers, plans are organized by TF (Task Force), not by linear phases.
+In humanpowers, plans are organized by task, not by linear phases.
 
-Each TF gets its own plan section:
+Each task gets its own plan section:
 
   ```markdown
-  ## TF-1a: 검색 UI (action_type: ui)
+  ## Task 1a: 검색 UI (action_type: ui)
 
-  **Spec source**: `tfs.md#TF-1a`
-  **VERIFY (signed_off)**: `tfs/TF-1a/expected-outputs.md`
+  **Spec source**: `tasks.md#1a`
+  **VERIFY (signed_off)**: `tasks/1a/expected-outputs.md`
   **depends_on**: []
-  **Developer confirm gate**: REQUIRED before Task 1 of this TF begins.
+  **Developer confirm gate**: REQUIRED before Task 1 of this task begins.
 
   ### Task 1: ...
   ### Task 2: ...
   ```
 
-After all tasks for a TF complete, mark `status: built` in `tfs.md`. Run humanpowers:verification-before-completion before next TF.
+After all steps for a task complete, mark `status: built` in `tasks.md`. Run humanpowers:verification-before-completion before next task.
 
 ### Developer Confirm Gates (humanpowers principle)
 
-Each TF plan MUST have:
+Each task plan MUST have:
 
-1. **Pre-build gate**: Developer confirms TF spec + expected-outputs are signed_off. If not, abort and re-run quiz.
-2. **Mid-build checkpoints**: After each Task in TF, developer has option to inspect (not required, but available).
+1. **Pre-build gate**: Developer confirms task spec + expected-outputs are signed_off. If not, abort and re-run quiz.
+2. **Mid-build checkpoints**: After each step in task, developer has option to inspect (not required, but available).
 3. **Post-build gate**: Run humanpowers:verification-before-completion → developer demo signoff. NO code-pass-only completion.
 
 Gates are explicit. AI does NOT proceed past gate without developer action.
 
 ## Build Order from depends_on
 
-Read `tfs.md`. Compute topological order from `depends_on` field:
+Read `tasks.md`. Compute topological order from `depends_on` field:
 
-1. TFs with `depends_on: []` → can start immediately, parallel-eligible.
-2. TFs with deps → wait until all deps `status: verified`.
+1. Tasks with `depends_on: []` → can start immediately, parallel-eligible.
+2. Tasks with deps → wait until all deps `status: verified`.
 3. Cycle in deps = abort, ask developer to break cycle.
 
-Use humanpowers:dispatching-parallel-agents for parallel-eligible TFs.
+Use humanpowers:dispatching-parallel-agents for parallel-eligible tasks.
 
 ## No Placeholders
 
@@ -174,11 +174,11 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 ## Execution Handoff
 
-After saving the per-TF plan, run developer confirm gate, then route to humanpowers:operate.
+After saving the per-task plan, run developer confirm gate, then route to humanpowers:operate.
 
-**"Plan complete and saved to `~/humanpowers/{project-name}/tfs/{TF-id}/build-plan.md`.**
+**"Plan complete and saved to `~/humanpowers/{project-name}/tasks/{id}/build-plan.md`.**
 
-**Pre-build gate (REQUIRED):** Developer confirms TF spec + expected-outputs are signed_off in `tfs.md`. If not signed_off → abort, re-run humanpowers:quiz for this TF.
+**Pre-build gate (REQUIRED):** Developer confirms task spec + expected-outputs are signed_off in `tasks.md`. If not signed_off → abort, re-run humanpowers:quiz for this task.
 
 **Build path options (after gate passes):**
 
@@ -186,7 +186,7 @@ After saving the per-TF plan, run developer confirm gate, then route to humanpow
 
 **2. Inline Execution** — Tasks in this session, checkpoint after each.
 
-**3. Parallel TF-fanout** — When multiple TFs have `depends_on: []` and are independent, dispatch in parallel.
+**3. Parallel task fanout** — When multiple tasks have `depends_on: []` and are independent, dispatch in parallel using `humanpowers:operate --batch`.
 
 **Which approach?"**
 
@@ -195,11 +195,11 @@ After saving the per-TF plan, run developer confirm gate, then route to humanpow
 - After all tasks complete → humanpowers:verification-before-completion (post-build gate, developer demo signoff).
 
 **If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** humanpowers:operate (drives TF lifecycle: build → verify → mark `status: built`).
+- **REQUIRED SUB-SKILL:** humanpowers:operate (drives task lifecycle: build → verify → mark `status: built`).
 - After all tasks complete → humanpowers:verification-before-completion.
 
-**If Parallel TF-fanout chosen:**
+**If Parallel task fanout chosen:**
 - **REQUIRED SUB-SKILL:** humanpowers:dispatching-parallel-agents.
-- Each parallel branch must independently pass humanpowers:verification-before-completion before its TF is marked `status: verified`.
+- Each parallel branch must independently pass humanpowers:verification-before-completion before its task is marked `status: verified`.
 
 **Terminal state:** humanpowers:verification-before-completion. NO code-pass-only completion. Developer demo signoff required.
