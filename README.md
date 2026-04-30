@@ -39,34 +39,11 @@ Inside Claude Code:
 
 **Node.js** is optional — needed only for the visual companion feature in brainstorming (mockups and diagrams in your browser). The rest of the workflow works without it.
 
-<details>
-<summary>Install Node.js</summary>
-
-**macOS**
-```bash
-brew install node
-```
-
-**Windows**
-```powershell
-winget install OpenJS.NodeJS
-```
-
-**Linux**
-```bash
-# Debian/Ubuntu
-sudo apt install nodejs
-
-# Fedora/RHEL
-sudo dnf install nodejs
-
-# Arch
-sudo pacman -S nodejs
-```
-
-Verify: `node --version`
-
-</details>
+| OS | Install |
+|----|---------|
+| macOS | `brew install node` |
+| Windows | `winget install OpenJS.NodeJS` |
+| Linux | `sudo apt install nodejs` / `sudo dnf install nodejs` / `sudo pacman -S nodejs` |
 
 ## Quick start
 
