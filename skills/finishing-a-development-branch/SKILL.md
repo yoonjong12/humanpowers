@@ -269,43 +269,11 @@ git worktree remove <worktree-path>
 - Get typed confirmation for Option 4
 - Clean up worktree for Options 1 & 4 only
 
-## humanpowers final acceptance
-
-Before merge/PR/cleanup:
-
-1. Verify ALL tasks in `tasks.md` have `status: verified`. If any not verified, halt.
-2. Run `scripts/render-views.sh` — final views/*.md updated.
-3. Show developer the `views/progress.md` matrix — all checkboxes filled.
-4. Developer explicit signoff via AskUserQuestion:
-   - "All tasks verified. Ready to finalize? PASS / HOLD / ABORT"
-5. PASS → bump `developer.md` version (e.g., v1.0 → v1.1 minor or v2.0 major if pivot occurred).
-6. Commit + tag git.
-
-## developer.md Version bump rules
-
-Locate `developer.md` header `version: vX.Y`.
-
-- **Minor (X.Y → X.Y+1)**: task additions, non-structural edits, NFR additions.
-- **Major (X.Y → X+1.0)**: Matrix structure pivot (e.g., concern/action_type changes), task removal, persona change.
-
-Edit `developer.md` first line:
-
-```yaml
-version: v1.1 (2026-04-28, added Task 3d image search)
-```
-
-Commit:
-
-```bash
-git commit -m "release: humanpowers project v1.1 - Task 3d added"
-git tag v1.1
-```
-
 ## Integration
 
 **Called by:**
-- **subagent-driven-development** (Step 7) - After all tasks complete
-- **executing-plans** (Step 5) - After all batches complete
+- **subagent-driven-development** (Step 7) — after all tasks complete
+- **operate --batch** — after the final task in the batch is verified
 
 **Pairs with:**
-- **using-git-worktrees** - Cleans up worktree created by that skill
+- **using-git-worktrees** — cleans up the worktree created by that skill
