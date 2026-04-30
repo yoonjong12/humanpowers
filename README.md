@@ -33,6 +33,41 @@ Inside Claude Code:
 /plugin install humanpowers@humanpowers-marketplace
 ```
 
+## Prerequisites
+
+**Claude Code** is required (the only hard dependency).
+
+**Node.js** is optional — needed only for the visual companion feature in brainstorming (mockups and diagrams in your browser). The rest of the workflow works without it.
+
+<details>
+<summary>Install Node.js</summary>
+
+**macOS**
+```bash
+brew install node
+```
+
+**Windows**
+```powershell
+winget install OpenJS.NodeJS
+```
+
+**Linux**
+```bash
+# Debian/Ubuntu
+sudo apt install nodejs
+
+# Fedora/RHEL
+sudo dnf install nodejs
+
+# Arch
+sudo pacman -S nodejs
+```
+
+Verify: `node --version`
+
+</details>
+
 ## Quick start
 
 After install, restart the session, then in any directory:
