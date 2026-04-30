@@ -15,19 +15,19 @@ The developer may resist. Persist. Specifics force articulation. Articulation pr
 
 # Brainstorming Ideas Into Designs
 
-Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
+Help turn ideas into a problem definition through natural collaborative dialogue. This skill produces `problem.md` only — task structure (with item IDs) is the next skill's job (`humanpowers:writing-plans`).
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
+Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the problem definition and get user approval.
 
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
+Do NOT invoke any implementation skill, write any code, or take an implementation action until you have presented `problem.md` and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
 ## humanpowers context
 
-When invoked by `humanpowers:humanpowers` (the dispatcher), the workspace `.humanpowers/state.json` exists with `phase = ""`. Treat the brainstorm output as `problem.md`, NOT the generic superpowers spec.
+When invoked by `humanpowers:humanpowers` (the dispatcher), the workspace `.humanpowers/state.json` exists with `phase = ""`. The brainstorm output is `problem.md`, located at `<workspace>/.humanpowers/problem.md`. Use the template at `references/templates/problem.md`.
 
-**Save location:** `<workspace>/.humanpowers/problem.md` (use template at `references/templates/problem.md` from this plugin).
+`problem.md` items receive stable IDs: `criterion-N`, `invariant-N`, `out-of-scope-N`, `open-question-N`. Downstream artifacts (`tasks.md`, the per-task quiz, plans, the ADR digest) cite these IDs, so once an ID is assigned, do not change it — append new IDs instead.
 
 **Phase transition:** After the developer signs off on `problem.md`, run:
 
@@ -37,11 +37,11 @@ WS="$(dirname "$WS")"
 bash scripts/update-state.sh "$WS" phase problem-defined
 ```
 
-Then hand off to `humanpowers:quiz`. Do NOT invoke writing-plans here; quiz comes first in humanpowers.
+Then hand off to `humanpowers:writing-plans`. The flow is brainstorm → writing-plans → quiz → operate. Writing-plans expands the preliminary task outline in `problem.md` into `tasks.md` with full per-task item IDs; the quiz then cites those IDs without inventing new ones.
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The problem definition can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
 
 ## Checklist
 
@@ -52,11 +52,12 @@ You MUST create a task for each of these items and complete them in order:
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Task extraction** — decompose design into task atomic units; capture 5 fields per task
-7. **Write workspace outputs** — `problem.md` under `<workspace>/.humanpowers/` and commit
-8. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-9. **User reviews tasks + problem.md** — ask user to review before proceeding
-10. **Transition to quiz** — invoke humanpowers:quiz skill to articulate expected outputs per task
+6. **Assign item IDs** — number criteria, invariants, out-of-scope items, open questions
+7. **Preliminary task outline** — list task names + 1-line rationale + files touched (no full task structure yet — that is `humanpowers:writing-plans`'s job)
+8. **Write `problem.md`** — under `<workspace>/.humanpowers/` and commit
+9. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+10. **User reviews `problem.md`** — ask user to review before proceeding
+11. **Transition to writing-plans** — invoke `humanpowers:writing-plans` to expand the preliminary outline into `tasks.md` with full item IDs
 
 ## Process Flow
 
@@ -69,11 +70,12 @@ digraph brainstorming {
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
-    "Task extraction\n(per-task, one at a time)" [shape=box];
-    "Write workspace outputs\n(problem.md)" [shape=box];
+    "Assign item IDs\n(criterion / invariant / out-of-scope / open-question)" [shape=box];
+    "Preliminary task outline\n(names + 1-line rationale)" [shape=box];
+    "Write problem.md" [shape=box];
     "Spec self-review\n(fix inline)" [shape=box];
-    "User reviews tasks + problem.md?" [shape=diamond];
-    "Invoke humanpowers:quiz skill" [shape=doublecircle];
+    "User reviews problem.md?" [shape=diamond];
+    "Invoke humanpowers:writing-plans" [shape=doublecircle];
 
     "Explore project context" -> "Visual questions ahead?";
     "Visual questions ahead?" -> "Offer Visual Companion\n(own message, no other content)" [label="yes"];
@@ -83,16 +85,17 @@ digraph brainstorming {
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Task extraction\n(per-task, one at a time)" [label="yes"];
-    "Task extraction\n(per-task, one at a time)" -> "Write workspace outputs\n(problem.md)";
-    "Write workspace outputs\n(problem.md)" -> "Spec self-review\n(fix inline)";
-    "Spec self-review\n(fix inline)" -> "User reviews tasks + problem.md?";
-    "User reviews tasks + problem.md?" -> "Task extraction\n(per-task, one at a time)" [label="changes requested"];
-    "User reviews tasks + problem.md?" -> "Invoke humanpowers:quiz skill" [label="approved"];
+    "User approves design?" -> "Assign item IDs\n(criterion / invariant / out-of-scope / open-question)" [label="yes"];
+    "Assign item IDs\n(criterion / invariant / out-of-scope / open-question)" -> "Preliminary task outline\n(names + 1-line rationale)";
+    "Preliminary task outline\n(names + 1-line rationale)" -> "Write problem.md";
+    "Write problem.md" -> "Spec self-review\n(fix inline)";
+    "Spec self-review\n(fix inline)" -> "User reviews problem.md?";
+    "User reviews problem.md?" -> "Write problem.md" [label="changes requested"];
+    "User reviews problem.md?" -> "Invoke humanpowers:writing-plans" [label="approved"];
 }
 ```
 
-**The terminal state is invoking humanpowers:quiz.** Do NOT invoke writing-plans, frontend-design, mcp-builder, or any other implementation skill. Quiz forces the developer to articulate expected outputs per task before any implementation plan.
+**The terminal state is invoking `humanpowers:writing-plans`.** Do NOT invoke quiz, frontend-design, mcp-builder, or any other skill from here. Writing-plans is the next step.
 
 ## The Process
 
@@ -100,7 +103,7 @@ digraph brainstorming {
 
 - Check out the current project state first (files, docs, recent commits)
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
-- If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
+- If the project is too large for a single problem definition, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal flow. Each sub-project gets its own brainstorm → writing-plans → quiz → implementation cycle.
 - For appropriately-scoped projects, ask questions one at a time to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
@@ -114,18 +117,11 @@ digraph brainstorming {
 
 **Presenting the design:**
 
-- Once you believe you understand what you're building, present the design
+- Once you believe you understand what you're building, present it
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, error handling, testing
 - Be ready to go back and clarify if something doesn't make sense
-
-**Design for isolation and clarity:**
-
-- Break the system into smaller units that each have one clear purpose, communicate through well-defined interfaces, and can be understood and tested independently
-- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
-- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
-- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
 
 **Working in existing codebases:**
 
@@ -133,59 +129,43 @@ digraph brainstorming {
 - Where existing code has problems that affect the work (e.g., a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.
 - Don't propose unrelated refactoring. Stay focused on what serves the current goal.
 
-## Step N+1: Task Extraction
+## Item ID assignment
 
-After design lock, decompose into task atomic units.
+After the developer approves the design, assign IDs before writing `problem.md`. Each ID is a stable identifier downstream artifacts will cite.
 
-For each task, capture 5 fields + metadata:
+| Section | ID format | Notes |
+|---------|-----------|-------|
+| Success criteria | `criterion-1`, `criterion-2`, … | Each criterion checkable without reading code |
+| Project invariants | `invariant-1`, `invariant-2`, … | Each invariant project-wide, not task-local |
+| Out of scope | `out-of-scope-1`, `out-of-scope-2`, … | Each item explicitly excluded behavior |
+| Open questions | `open-question-1`, `open-question-2`, … | Each question carries `[open]` / `[answered]` / `[deferred]` |
 
-  ```yaml
-  - id: 1a
-    name: short descriptive name
-    concern: developer-level scenario this serves
-    action_type: ui | api | data | infra | cross-cutting
-    who: persona (1 line)
-    what: result/behavior (1-3 lines)
-    why: value hypothesis (1 line)
-    verify_form: gherkin | curl | sql | checklist | composite  # matches action_type
-    nfr_local:
-      - row-local NFR (e.g., "<500ms response")
-    depends_on: []  # task ids this blocks on
-    status: brainstorm-done
-    mode: independent | facilitating | collaboration
-  ```
+IDs are append-only. Refining content under an ID is fine; reusing or renumbering is not. If an item is dropped, mark it removed in `problem.md` rather than reusing the ID.
 
-Developer confirms each task. Disagreements = revise spec, not skip.
+## Preliminary task outline
 
-Ask developer one task at a time.
+The brainstorm produces a list of tasks at the level of "what each task is for." Names + 1-line rationale + files touched. Do not author the per-task observable / verify-condition / constraint / assumption / dependency item IDs here — `humanpowers:writing-plans` does that next, working from this outline.
 
-### VERIFY form by action_type
+```markdown
+## Task outline (preliminary)
 
-| action_type | VERIFY form | Example |
-|-------------|-------------|---------|
-| ui | Gherkin (Given/When/Then) + Mock HTML/Figma | "Given user logged in / When click X / Then see Y" |
-| api | cURL + expected JSON / OpenAPI example | `curl -X POST /api/x -d '{...}'` → `{status: 200, body: {...}}` |
-| data | SQL assertion + sample row | `SELECT count(*) FROM x WHERE y = 'z'` → expect ≥1 |
-| infra | Checklist + health curl | `[x] env SET / [x] curl /health → 200` |
-| cross-cutting | Composite (all impacted task VERIFY pass) | No standalone test |
+1. **task-1: <name>** — files: `<paths>`. <rationale>
+2. **task-2: <name>** — files: `<paths>`. <rationale>
+```
 
-Use this table when prompting developer for VERIFY content.
+Task IDs (`task-1`, `task-2`, …) are assigned here and remain stable through writing-plans, quiz, operate, and verify.
 
-## NFR (Non-Functional Requirements) — 2 layers
+## Constraints across tasks
 
-**Project invariants** — `problem.md` section. Default 4 categories:
-- Security
-- Data integrity
-- Determinism
-- Compliance
+When the same constraint shows up implicitly across multiple tasks (e.g., latency, capacity cap, security rule), surface it inline:
 
-**task-local NFR** — Per task in `tasks.md`. Specific to one task.
+> "This constraint shows up in tasks {ids} — promote it to an `invariant-N` in problem.md?"
 
-**Promotion rule**: When the same constraint appears in 2+ tasks, surface it inline ("This constraint shows up in tasks {ids} — promote to project invariant?"). On developer confirm, move from per-task NFR rows into the `problem.md` Project invariants section.
+On developer confirm, add it to the Project invariants section with a fresh `invariant-N` ID. The constraint stays out of per-task NFR rows in `tasks.md` to avoid duplication.
 
-## Step N+2: Output to humanpowers workspace
+## Output
 
-Save output to `<workspace>/.humanpowers/problem.md` (use template at `references/templates/problem.md`).
+Save to `<workspace>/.humanpowers/problem.md` (use template at `references/templates/problem.md`).
 
 Set `.humanpowers/state.json` phase = `problem-defined` via:
 
@@ -195,46 +175,46 @@ WS="$(dirname "$WS")"
 bash scripts/update-state.sh "$WS" phase problem-defined
 ```
 
-Next phase = `quiz`.
+Next phase = `designed` (after `humanpowers:writing-plans` runs).
 
-## Step N+3: Hand off to quiz
+## Spec self-review
 
-Terminal state of brainstorming: invoke humanpowers:quiz skill (NOT writing-plans). Quiz module forces the developer to articulate expected outputs per task before any implementation plan.
+After writing `problem.md`, look at it with fresh eyes:
 
-## Documentation
-
-humanpowers writes `<workspace>/.humanpowers/problem.md` (from `references/templates/problem.md`). After sign-off, transition phase to `problem-defined` via `scripts/update-state.sh`. Next: humanpowers:quiz.
-
-**Spec Self-Review:**
-After writing the spec document, look at it with fresh eyes:
-
-1. **Placeholder scan:** Any "TBD", "TODO", incomplete sections, or vague requirements? Fix them.
-2. **Internal consistency:** Do any sections contradict each other? Does the architecture match the feature descriptions?
-3. **Scope check:** Is this focused enough for a single implementation plan, or does it need decomposition?
-4. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
+1. **Placeholder scan:** any "TBD", "TODO", incomplete sections, or vague requirements? Fix them.
+2. **Internal consistency:** do any sections contradict each other? Does the architecture description match the criteria?
+3. **Scope check:** is this focused enough for a single brainstorm → writing-plans → quiz cycle, or does it need decomposition?
+4. **Ambiguity check:** could any criterion or invariant be interpreted two different ways? If so, pick one and make it explicit.
+5. **ID hygiene:** does every criterion / invariant / out-of-scope / open-question item carry an ID? Are IDs sequential and unique?
 
 Fix any issues inline. No need to re-review — just fix and move on.
 
-**User Review Gate:**
-After the spec review loop passes, ask the user to review the written spec before proceeding:
+## User review gate
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+After the spec review loop passes, ask the user to review `problem.md` before proceeding:
+
+> "Problem definition written and committed to `<path>`. Please review it and let me know if you want to make any changes before we expand the task outline into `tasks.md` via writing-plans."
 
 Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
 
-**Quiz handoff:**
+## Hand off to writing-plans
 
-- Invoke the humanpowers:quiz skill to force developer articulation of expected outputs per task
-- Do NOT invoke writing-plans or any other implementation skill. humanpowers:quiz is the next step.
+Terminal state of brainstorming: invoke `humanpowers:writing-plans`. Writing-plans reads `problem.md` (criteria + invariants + open questions + preliminary task outline) and produces `tasks.md` with full per-task item IDs. Quiz comes after writing-plans, not before — it cites the IDs that writing-plans assigned.
+
+## Loop kick-back
+
+The brainstorm → writing-plans → quiz sequence is a loop, not a one-way pipeline. If writing-plans or quiz reveals that a criterion was wrong, an invariant was missing, or an open question implies a task split, the right move is to come back here. Update the relevant section of `problem.md` (refine an existing item, mark an open question as answered, append a new invariant), and writing-plans / quiz re-derive from the updated artifact.
+
+There is no formal trigger machine. The loop closes naturally when both artifacts and the developer's mental model agree.
 
 ## Key Principles
 
-- **One question at a time** - Don't overwhelm with multiple questions
-- **Multiple choice preferred** - Easier to answer than open-ended when possible
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
-- **Incremental validation** - Present design, get approval before moving on
-- **Be flexible** - Go back and clarify when something doesn't make sense
+- **One question at a time** — Don't overwhelm with multiple questions
+- **Multiple choice preferred** — Easier to answer than open-ended when possible
+- **YAGNI ruthlessly** — Remove unnecessary features
+- **Explore alternatives** — Always propose 2-3 approaches before settling
+- **Incremental validation** — Present design, get approval before moving on
+- **Be flexible** — Go back and clarify when something doesn't make sense
 
 ## Visual Companion
 
