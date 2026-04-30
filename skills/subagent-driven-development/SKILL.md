@@ -280,8 +280,17 @@ Done!
 
 In humanpowers, subagents play the role of task lead — ad-hoc per task, no fixed domain identity.
 
+**Before dispatching any implementer or spec reviewer subagent**, load the locked behavioral contract:
+
+```bash
+bash scripts/parse-answers.sh {task-id} "$WS"
+```
+
+Inject this output verbatim into the subagent prompt as `## Locked Behavior Spec`. Do NOT make the subagent read round1.md directly.
+
 **Dispatch convention**:
-- Pass `task-id` as primary context
-- Subagent reads: `tasks.md#{task-id}`, `tasks/{id}/round1.md`, `tasks/{id}/plan.md`
+- `## Locked Behavior Spec` = parse-answers.sh output (behavioral contract, injected by controller)
+- `## Implementation Plan` = plan.md full text (implementation guide, injected by controller)
 - Subagent acts within scope of that task only
 - Same human/agent can lead different tasks (no role attachment)
+- `round1.md` answers take precedence over plan.md interpretation when they conflict

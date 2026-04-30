@@ -2,15 +2,25 @@
 
 Use this template when dispatching an implementer subagent.
 
+**Before dispatching:** Run `bash scripts/parse-answers.sh {task-id} "$WS"` and inject the output into `## Locked Behavior Spec` below. Do NOT make the subagent read round1.md directly.
+
 ```
 Task tool (general-purpose):
   description: "Implement Task N: [task name]"
   prompt: |
     You are implementing Task N: [task name]
 
-    ## Task Description
+    ## Locked Behavior Spec (from round1.md — authoritative)
 
-    [FULL TEXT of task from plan - paste it here, don't make subagent read file]
+    These are the developer's locked decisions from the quiz phase. They override
+    your own judgment on any point they cover. Implement to satisfy these, not your
+    own interpretation.
+
+    [OUTPUT OF: bash scripts/parse-answers.sh {task-id} — paste verbatim]
+
+    ## Implementation Plan
+
+    [FULL TEXT of task from plan.md - paste it here, don't make subagent read file]
 
     ## Context
 
@@ -29,7 +39,7 @@ Task tool (general-purpose):
     ## Your Job
 
     Once you're clear on requirements:
-    1. Implement exactly what the task specifies
+    1. Implement to satisfy the Locked Behavior Spec first, plan second
     2. Write tests (following TDD if task says to)
     3. Verify implementation works
     4. Commit your work
@@ -76,8 +86,8 @@ Task tool (general-purpose):
     Review your work with fresh eyes. Ask yourself:
 
     **Completeness:**
-    - Did I fully implement everything in the spec?
-    - Did I miss any requirements?
+    - Did I satisfy every locked behavior spec item?
+    - Did I fully implement everything in the plan?
     - Are there edge cases I didn't handle?
 
     **Quality:**
