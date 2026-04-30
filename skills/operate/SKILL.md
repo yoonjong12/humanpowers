@@ -31,11 +31,10 @@ grep -q "id: $ID" "$WS/tasks.md" || { echo "Task $ID not found"; exit 1; }
 
 Read in this order:
 1. `tasks.md` — extract just task `{id}` 5-field row
-2. `tasks/{id}/expected-outputs.md` — signed_off VERIFY
-3. `tasks/{id}/plan.md` — current plan (if exists)
-4. `library/scratchpads/{id}.md` — accumulated notes (if exists)
+2. `tasks/{id}/round1.md` — signed_off expected behavior
+3. `tasks/{id}/round2.md` — if exists (developer-led answers)
+4. `tasks/{id}/plan.md` — current plan (if exists)
 5. `problem.md` — project invariants section
-6. Any `threads/*.md` post tagged with `{id}` — recent decisions
 
 DO NOT load: other tasks' specs, other tasks' plans (out of scope).
 
@@ -48,7 +47,7 @@ Action type: {action_type}
 Identity: ad-hoc (no domain). Same agent may lead different tasks in different sessions.
 Project invariants (from problem.md): [list]
 Task-local NFR (from tasks.md per-task entry): [list]
-Expected outputs (signed_off): [summary from expected-outputs.md]
+Expected behavior (signed_off): [summary from round1.md]
 ```
 
 ### Step 4: Determine work mode
@@ -75,38 +74,23 @@ Execute task using TDD:
 - Commit (small commit per task)
 - Mark `[x]` in plan.md
 
-If task references unclear behavior → re-check expected-outputs.md. If still unclear → halt + thread post.
+If task references unclear behavior → re-check round1.md. If still unclear → halt and surface the ambiguity to the developer.
 
 After all plan tasks complete: set tasks.md status = `built`. Hand off to verification.
 
-### Step 6: Update scratchpad (≤30 lines)
-
-After session, write/update `library/scratchpads/{id}.md`:
-
-```markdown
-# Task {id} Scratchpad — lead notes
-
-## Session 2026-04-28
-- Completed Tasks 3, 4
-- Blocker: depends_on task 2b (status: designed) — wait
-- Next session: continue from Task 5
-
-(keep under 30 lines — auto-truncated by hook)
-```
-
-### Step 7: Boundaries
+### Step 6: Boundaries
 
 - **Don't** modify problem.md (project invariants)
 - **Don't** modify other tasks' files
 - **Don't** invoke quiz module from operate (separate phase)
-- **Don't** auto-promote NFR — flag only, agent must thread post for developer confirm
+- **Don't** auto-promote a constraint to project invariants — flag inline, developer confirms before promotion
 
-### Step 8: Terminal state
+### Step 7: Terminal state
 
 After session ends:
 - All plan tasks done → invoke humanpowers:verification-before-completion
-- Some tasks done → update scratchpad, hand back to dispatcher (`/humanpowers continue`)
-- Blocked → write `threads/blocker-{id}.md`, hand back
+- Some tasks done → hand back to dispatcher (`/humanpowers continue`)
+- Blocked → halt and report the blocker (which task / state) to the developer
 
 Tell developer next step explicitly.
 

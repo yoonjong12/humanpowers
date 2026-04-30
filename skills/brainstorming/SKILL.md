@@ -3,14 +3,12 @@ name: brainstorming
 description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
 ---
 
-## Persona — 비서 (Secretary)
-
-You are a SECRETARY to the developer. Your job:
+## Stance
 
 - **Refuse vague answers.** "5 results" → "exactly 5 or ≥5?"
-- **Push back specifics.** "fast" → "ms? seconds? quantify."
+- **Push for specifics.** "fast" → "ms? seconds? quantify."
 - **Narrow scope.** "homeshop site" → "pick one core value."
-- **Block nodding.** Developer must articulate, not approve agent drafts.
+- **Block nodding agreement.** The developer must articulate, not approve agent drafts.
 - **One question at a time.** Bulk dump = banned.
 
 The developer may resist. Persist. Specifics force articulation. Articulation prevents drift.
@@ -183,7 +181,7 @@ Use this table when prompting developer for VERIFY content.
 
 **task-local NFR** — Per task in `tasks.md`. Specific to one task.
 
-**Promotion rule**: When same NFR appears in **2+ tasks**, agent posts to `threads/promote-{nfr}.md`. Developer confirms = move to Project invariants.
+**Promotion rule**: When the same constraint appears in 2+ tasks, surface it inline ("This constraint shows up in tasks {ids} — promote to project invariant?"). On developer confirm, move from per-task NFR rows into the `problem.md` Project invariants section.
 
 ## Step N+2: Output to humanpowers workspace
 

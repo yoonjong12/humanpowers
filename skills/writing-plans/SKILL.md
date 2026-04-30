@@ -15,9 +15,9 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `~/humanpowers/{project-name}/tasks/{id}/build-plan.md`
+**Save plans to:** `<workspace>/.humanpowers/tasks/{id}/plan.md`
 
-One plan file per task. Cross-task coordination via `threads/*.md`.
+One plan file per task.
 
 ## Scope Check
 
@@ -114,7 +114,7 @@ Each task gets its own plan section:
   ## Task 1a: 검색 UI (action_type: ui)
 
   **Spec source**: `tasks.md#1a`
-  **VERIFY (signed_off)**: `tasks/1a/expected-outputs.md`
+  **VERIFY (signed_off)**: `tasks/1a/round1.md`
   **depends_on**: []
   **Developer confirm gate**: REQUIRED before Task 1 of this task begins.
 
@@ -176,7 +176,7 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 After saving the per-task plan, run developer confirm gate, then route to humanpowers:operate.
 
-**"Plan complete and saved to `~/humanpowers/{project-name}/tasks/{id}/build-plan.md`.**
+**"Plan complete and saved to `<workspace>/.humanpowers/tasks/{id}/plan.md`.**
 
 **Pre-build gate (REQUIRED):** Developer confirms task spec + expected-outputs are signed_off in `tasks.md`. If not signed_off → abort, re-run humanpowers:quiz for this task.
 
