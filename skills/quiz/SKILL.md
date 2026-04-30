@@ -59,7 +59,7 @@ DO NOT pre-fill agent's own answers. Developer must articulate from blank.
 
 ### Step 2: Developer writes round1.md
 
-Use `references/templates/response-d1-template.md` as starting skeleton. Developer fills each Q answer.
+Use `references/templates/response-round1-template.md` as starting skeleton. Developer fills each Q answer.
 
 humanpowers waits for developer to commit (or save) the file before proceeding.
 
@@ -131,7 +131,7 @@ If "Yes":
 AskUserQuestion:
   Q: 템플릿 받으시겠어요? 또는 자유 형식?
   options:
-    - 템플릿 (response-d2-template.md copied)
+    - 템플릿 (response-round2-template.md copied)
     - 자유 형식 (developer handles)
   + free text: filename for round2.md (default = standard path)
 ```

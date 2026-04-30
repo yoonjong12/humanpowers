@@ -110,4 +110,4 @@ Set `last_review` timestamp. Persist any chosen next phase.
 
 - Don't auto-bump version — developer must choose
 - Don't auto-close threads — developer must mark
-- Don't cascade re-quiz on multiple TFs at once — one at a time
+- Don't cascade re-quiz on multiple tasks at once — one at a time
