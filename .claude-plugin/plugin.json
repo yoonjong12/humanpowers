@@ -1,6 +1,6 @@
 {
   "name": "humanpowers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "humanpowers structures the developer's design work as the load-bearing element of AI-assisted development. Problem-first workflow with task decomposition, per-task quiz / plan / operate / verify / review / finish. Workspace is local-only; the decision digest is the only artifact committed.",
   "author": {
     "name": "yoonjong12",
