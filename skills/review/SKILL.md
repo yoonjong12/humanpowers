@@ -1,6 +1,6 @@
 ---
 name: review
-description: Use after multiple tasks are verified to perform developer review of the project state, optionally bump developer.md version, and identify next priorities. Distinct from per-task verification (which is humanpowers:verification-before-completion). This is project-level review with cascade decisions.
+description: Use after multiple tasks are verified to perform a project-level review of the workspace state and identify next priorities. Distinct from per-task verification (humanpowers:verification-before-completion). This is project-level review with cascade decisions.
 ---
 
 # Review Skill
@@ -15,90 +15,77 @@ description: Use after multiple tasks are verified to perform developer review o
 
 ### Step 1: Aggregate state
 
-Run `scripts/render-views.sh` to ensure views/*.md current.
+Resolve workspace via upward search from cwd:
+
+```bash
+DIR="$(pwd)"; WS=""
+while [ "$DIR" != "/" ]; do
+  [ -f "$DIR/.humanpowers/state.json" ] && WS="$DIR" && break
+  DIR="$(dirname "$DIR")"
+done
+[ -z "$WS" ] && { echo "no humanpowers workspace"; exit 1; }
+```
 
 Read:
-- `views/progress.md` — status overview
-- `developer.md` — invariants + version
-- All `threads/*.md` — open vs resolved
+- `<WS>/.humanpowers/state.json` — phase + task counts
+- `<WS>/.humanpowers/problem.md` — project invariants
+- `<WS>/.humanpowers/tasks.md` — per-task status
 
-### Step 2: Show developer the review summary
+### Step 2: Show the developer the review summary
 
 Display:
-```
-Project: {name}
-Version: {developer.md version}
 
-Tasks: {N total}
+```
+Workspace: <WS>/.humanpowers/
+Phase: {state.phase}
+
+Tasks: {tasks_total} total
   problem-defined: {x}
-  quiz-done: {x}
-  designed: {x}
-  built: {x}
-  verified: {x}
+  quiz-done:       {x}
+  designed:        {x}
+  built:           {x}
+  verified:        {x}
 
-Open threads: {count}
-Resolved threads: {count}
+Project invariants (from problem.md): {N invariants}
 
-project invariant violations (auto-detect): {none | list}
+Project invariant violations (auto-detect): {none | list}
 ```
 
-Pull invariant violations by scanning recent commits + tasks.md changes.
+Pull invariant violations by scanning recent commits and `tasks.md` changes — if a task's behavior or NFR contradicts a project invariant, flag it.
 
 ### Step 3: AskUserQuestion — review options
 
 ```
-Q: 프로젝트 review 결과. 다음 액션?
+Q: Project review summary above. Next action?
 options:
-  - 1. 다음 task 우선순위 결정 (continue building)
-  - 2. developer.md version bump (minor/major)
-  - 3. Cascade — 특정 task expected-outputs 재검토 (re-quiz)
-  - 4. Open threads 처리 (developer reviews threads)
-  - 5. Finalize (humanpowers:finishing-a-development-branch)
+  - 1. Decide next task priority (continue building)
+  - 2. Cascade — re-quiz a specific task (reset its status to problem-defined)
+  - 3. Finalize (humanpowers:finishing-a-development-branch)
 ```
 
 ### Step 4a: Option 1 — Priority decision
 
-Compute `depends_on` frontier — tasks whose deps are verified.
+Compute the `depends_on` frontier — tasks whose dependencies are all `verified`.
 
-AskUserQuestion:
 ```
-Q: 다음 task 후보 (frontier): task-X / task-Y / task-Z. 어디 우선?
-options: [task-X, task-Y, task-Z, parallel-all, custom]
+AskUserQuestion:
+  Q: Next task candidates (frontier): task-X / task-Y / task-Z. Which one first?
+  options: [task-X, task-Y, task-Z, parallel-all, custom]
 ```
 
 Hand off: `/humanpowers operate {chosen-task}`.
 
-### Step 4b: Option 2 — Version bump
+### Step 4b: Option 2 — Cascade re-quiz
 
+```
 AskUserQuestion:
-```
-Q: 버전 bump 종류?
-options:
-  - minor (X.Y → X.Y+1) — task 추가 / 비-구조 edit
-  - major (X.Y → X+1.0) — 매트릭스 구조 pivot / task 제거
+  Q: Which task's expected behavior do you want to re-examine?
+  free text: task-id
 ```
 
-Edit developer.md frontmatter version. Commit + tag git.
+Reset that task's `status` to `problem-defined` in `tasks.md`. Hand off to humanpowers:quiz.
 
-### Step 4c: Option 3 — Cascade re-quiz
-
-AskUserQuestion:
-```
-Q: 어느 task 의 expected-outputs 재검토?
-free text: task-id
-```
-
-Reset that task's `status: problem-defined`. Hand off to humanpowers:quiz.
-
-### Step 4d: Option 4 — Threads
-
-List open threads. AskUserQuestion per thread:
-```
-Q: thread {topic} 상태?
-options: [resolved (close), still open, escalate]
-```
-
-### Step 4e: Option 5 — Finalize
+### Step 4c: Option 3 — Finalize
 
 Hand off to humanpowers:finishing-a-development-branch.
 
@@ -106,8 +93,12 @@ Hand off to humanpowers:finishing-a-development-branch.
 
 Set `last_review` timestamp. Persist any chosen next phase.
 
+```bash
+bash scripts/update-state.sh "$WS" last_review "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+```
+
 ## Boundaries
 
-- Don't auto-bump version — developer must choose
-- Don't auto-close threads — developer must mark
+- Don't auto-reset task status — the developer must choose the cascade target
 - Don't cascade re-quiz on multiple tasks at once — one at a time
+- Don't modify project invariants from this skill — that's brainstorming's job
