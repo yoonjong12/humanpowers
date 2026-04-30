@@ -63,12 +63,14 @@ Rows of the matrix. Fixed.
 
 ### Step 1: Activation log
 
-For the task, fill the activation log: which dimensions are active, why, and how many decision points each is expected to yield. Skipped dimensions get an explicit reason. The developer can challenge skips before any cell is drafted.
+Before filling the activation log, read the existing code to identify decision points (code read source, medium trust). If this research surfaces a conflict between the existing implementation and a task design item, annotate the affected dimension row with `⚠ CONFLICT:` inline — see Rule 9 in `references/quiz-guidelines.md`.
+
+Fill the activation log: which dimensions are active, why, how many decision points each yields. Skipped dimensions get an explicit reason.
 
 | Dimension | Active? | Reason | Predicted decision points |
 |-----------|---------|--------|---------------------------|
 
-After the developer acknowledges activation, proceed to Step 2.
+At acknowledgment, the developer must resolve any `⚠ CONFLICT:` annotations (Proceed / Pause / Dismiss) before proceeding to Step 2. If unresolved, do not draft cells.
 
 ### Step 2: Draft the coverage matrix
 

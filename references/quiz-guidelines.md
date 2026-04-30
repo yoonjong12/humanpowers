@@ -79,6 +79,26 @@ For each Q, after the developer answers, the agent runs a critique pass. Any rem
 
 After every active cell has an answer (or `deferred` mark) and every critique log is clean, the agent proposes a lock candidate. The developer confirms (`lock` or equivalent). After lock, the matrix is frozen as the test spec for `humanpowers:operate` and `humanpowers:verification-before-completion`.
 
+### Rule 9 — Research conflicts surface in the activation log
+
+When code research during activation log preparation surfaces a conflict between existing implementation and a task design item (a constraint, assumption, observable, or dependency), the agent annotates the affected dimension row with a `⚠ CONFLICT:` note — not just in Q body context.
+
+Format: add the conflict inline to the activation log Reason column:
+
+```
+| Decision | ✓ | constraint-1 → FK strategy | ⚠ CONFLICT: swap-schema renames graph schema; cross-schema FK survives rename but cascade won't fire on new graph.wisdoms; pcr drop-schema graph_old may fail on FK dep | 2 |
+```
+
+At activation acknowledgment, the developer picks one of three responses:
+
+- **Proceed** — "Aware, will address in Q answer." No action on the activation log; Q body drafting continues.
+- **Pause** — "Need to revise task design first." Loop kick-back to `humanpowers:writing-plans` (if task-level item) or `humanpowers:brainstorming` (if problem-level item) before Q body drafting resumes.
+- **Dismiss** — "Not a conflict, here's why." Agent removes the annotation and proceeds.
+
+Conflict annotations carry medium trust (code read source). The annotation is not a diagnosis — it is the agent saying "I found something that might matter." The developer rules on it.
+
+If no response is given at acknowledgment, the agent treats the conflict as unresolved and does not proceed to Q body drafting.
+
 ## Loop kick-back
 
 The brainstorm → writing-plans → quiz sequence is not linear. The quiz is the place where mismatches between the developer's mental model and the agent's reading of the artifacts surface. When that happens, returning to an earlier skill is the right move, not a regression.
