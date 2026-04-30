@@ -60,6 +60,7 @@ Each cell expands into a Q body. One Q = one decision. The Q heading repeats the
 
 **Developer answer**:
 <!-- 자유 기술. 한 줄도 OK. 빈 칸 = deferred (agent re-prompts on lock attempt). -->
+<!-- PARSER: this line must start with exactly `**Developer answer:**` — parse-answers.sh locates answers by this prefix. Do not change the prefix. -->
 
 **Source (evidence anchor)**:
 <!-- e.g., `tasks.md#task-1.constraint-1` / `curator.py:142` / `problem.md#invariant-2` / `external doc URL` / `guess (no source)`. `guess` flags this answer as weak — agent will surface it in critique. -->

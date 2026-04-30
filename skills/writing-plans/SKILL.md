@@ -172,7 +172,13 @@ Every step must contain the actual content the engineer needs. These are **plan 
 
 ## Self-Review
 
-After writing `tasks.md` and all `tasks/{id}/plan.md` files, look at them with fresh eyes:
+After writing `tasks.md` and all `tasks/{id}/plan.md` files, look at them with fresh eyes.
+
+When cross-checking specific criteria or invariants, fetch only what you need:
+```bash
+bash scripts/get-invariant.sh criterion-N "$WS"
+bash scripts/get-invariant.sh invariant-N "$WS"
+```
 
 1. **problem.md coverage:** Does each `criterion-N` map to at least one task's observable or verify-condition? Does each `invariant-N` apply to at least one task's constraint? List gaps.
 2. **Item ID hygiene:** Does every `task-N` have all five categories present (even if empty)? Are IDs sequential and unique?

@@ -114,9 +114,17 @@ Use AskUserQuestion to wait:
 Q: Have you completed round1.md for task-{id}? options: Done / Skip task / Abort
 ```
 
+After developer confirms Done, load answers — do NOT read full round1.md:
+
+```bash
+bash scripts/parse-answers.sh {id} "$WS"
+```
+
+Output: one `===Q-{Dim}.{item-id}` header per answered Q, followed by the full developer answer block.
+
 ### Step 5: Per-Q critique loop (one AskUserQuestion at a time)
 
-Read the developer's answer for each Q. Run a critique pass:
+Use the parse-answers.sh output (loaded in Step 4) to get each Q's answer. Do NOT re-read round1.md. Run a critique pass:
 
 - Is the answer ambiguous (still vague after attempt)?
 - Does it contradict another cell's answer or a cited invariant?

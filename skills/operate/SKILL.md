@@ -29,13 +29,15 @@ grep -q "id: $ID" "$WS/tasks.md" || { echo "Task $ID not found"; exit 1; }
 
 ### Step 2: Load task context
 
-Read in this order:
-1. `tasks.md` — extract just task `{id}` 5-field row
-2. `tasks/{id}/round1.md` — signed_off expected behavior
-3. `tasks/{id}/round2.md` — if exists (developer-led answers)
-4. `tasks/{id}/plan.md` — current plan (if exists)
-5. `problem.md` — project invariants section
+Load in this order — use scripts to avoid reading full files:
 
+1. Task spec: `bash scripts/get-task.sh {id} "$WS"` — extracts task-{id} section only
+2. `tasks/{id}/round1.md` — signed_off expected behavior (full read; it is the test spec)
+3. `tasks/{id}/round2.md` — if exists (developer-led answers)
+4. Plan header only: `head -30 tasks/{id}/plan.md` — goal + files touched
+5. Invariants: `bash scripts/get-invariant.sh invariant-N "$WS"` for each relevant invariant
+
+DO NOT read full tasks.md or full problem.md — use scripts above.
 DO NOT load: other tasks' specs, other tasks' plans (out of scope).
 
 ### Step 3: Assume task lead role
@@ -64,7 +66,11 @@ Check `tasks.md#{id}` status:
 
 ### Step 5: Execute plan tasks (status=designed)
 
-Read `tasks/{id}/plan.md`. Find first unchecked task.
+Find the first unchecked step. Load only that step — do NOT read full plan.md:
+
+```bash
+bash scripts/get-step.sh {id} {step-n} "$WS"
+```
 
 Execute task using TDD:
 - Write failing test

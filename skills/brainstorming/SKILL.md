@@ -205,6 +205,14 @@ Terminal state of brainstorming: invoke `humanpowers:writing-plans`. Writing-pla
 
 The brainstorm → writing-plans → quiz sequence is a loop, not a one-way pipeline. If writing-plans or quiz reveals that a criterion was wrong, an invariant was missing, or an open question implies a task split, the right move is to come back here. Update the relevant section of `problem.md` (refine an existing item, mark an open question as answered, append a new invariant), and writing-plans / quiz re-derive from the updated artifact.
 
+When referencing a specific item during loop kick-back, fetch only that item — do NOT read full problem.md:
+
+```bash
+bash scripts/get-invariant.sh criterion-N "$WS"
+bash scripts/get-invariant.sh invariant-N "$WS"
+bash scripts/get-invariant.sh open-question-N "$WS"
+```
+
 There is no formal trigger machine. The loop closes naturally when both artifacts and the developer's mental model agree.
 
 ## Key Principles
