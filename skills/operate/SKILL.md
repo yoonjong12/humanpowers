@@ -1,6 +1,6 @@
 ---
 name: operate
-description: Use to invoke a task lead role and execute work for a specific task. Routes from /humanpowers operate {id}. Loads task context (spec + expected-outputs + plan + scratchpad), assumes the lead persona for that task, executes pending work, updates status. Generic — no domain identity. Same agent can lead different tasks.
+description: Use to invoke a task lead role and execute work for a specific task. Routes from /humanpowers operate {id}. Loads task context (spec + round1.md + plan), assumes the task lead role, executes pending work, updates status. Generic — no domain identity. Same agent can lead different tasks.
 ---
 
 # Operate Skill
@@ -38,7 +38,7 @@ Read in this order:
 
 DO NOT load: other tasks' specs, other tasks' plans (out of scope).
 
-### Step 3: Assume task lead persona
+### Step 3: Assume task lead role
 
 ```
 You are task lead for {id} ({name}).

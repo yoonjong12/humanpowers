@@ -18,7 +18,7 @@ writing-plans (task-unit build plans)
   ↓
 test-driven-development (uses round1.md as test spec)
   ↓
-operate per task (or executing-plans for batch)
+operate per task (or operate --batch)
   ↓
 verification-before-completion (developer demo signoff)
 ```
@@ -195,7 +195,7 @@ If "1. 논의 필요":
 - Final cascade decision (checkbox in discussion.md):
   - [ ] 해당 task round1.md 갱신
   - [ ] 해당 task 5필드 spec (tasks.md) 갱신
-  - [ ] project invariants / 페르소나 갱신
+  - [ ] project invariants 갱신
   - [ ] 다른 task 영향 (flag only — developer 명시 invoke)
 
 ### Lock

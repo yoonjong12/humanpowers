@@ -1,6 +1,6 @@
 # Task {X} Round 2 Discussion — Cascade Refinement (EXAMPLE)
 
-> Linked: response-round2-developer.md / response-round2-agent.md
+> Linked: tasks/{X}/round2.md (developer answers + agent's parallel pass)
 
 ## Q5: Search index infrastructure
 
@@ -36,10 +36,10 @@
 - 단, 향후 SKU 1만 도달 시 재검토 trigger 필요 (problem.md invariant 추가 권장).
 
 **Cascade 영향 범위**:
-- [x] 해당 task expected-outputs 갱신 — Q5 lock with "Postgres tsvector + GIN, mecab-ko"
+- [x] 해당 task round1.md 갱신 — Q5 lock with "Postgres tsvector + GIN, mecab-ko"
 - [x] 해당 task 5필드 spec (tasks.md) 갱신 — `nfr_local: ["검색 latency p99 < 50ms"]`
-- [x] problem.md 불변식 / 페르소나 갱신 — Add invariant: "검색 인프라 = Postgres-only. SKU > 10000 도달 시 재설계 trigger."
+- [x] problem.md 불변식 (project invariants) 갱신 — Add invariant: "검색 인프라 = Postgres-only. SKU > 10000 도달 시 재설계 trigger."
 - [ ] 다른 task 영향 (flag only — developer 명시 invoke 필요)
   - Flagged: Task 2 상품 상세 (검색 결과 click) might share index — needs explicit re-quiz
 
-**Final**: Postgres tsvector + GIN index + mecab-ko. Locked. problem.md version → v1.1.
+**Final**: Postgres tsvector + GIN index + mecab-ko. Locked.

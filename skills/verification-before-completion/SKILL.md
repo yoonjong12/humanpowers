@@ -10,7 +10,7 @@ description: Use when about to claim work is complete, fixed, or passing, before
 **superpowers**: "All tests pass + types check + linter clean = verified."
 **humanpowers**: "Developer watched the demo + signed off = verified. Code passes are necessary but NOT sufficient."
 
-VERIFY = signed_off `tasks/{id}/expected-outputs.md` from quiz phase.
+VERIFY = signed_off `tasks/{id}/round1.md` from quiz phase.
 
 ## Demo form by action_type
 
@@ -26,7 +26,7 @@ Developer WATCHES the demo (or operates it themselves). Agent does NOT run demo 
 
 ## Signoff process
 
-1. Agent prepares demo per `expected-outputs.md` Q list.
+1. Agent prepares demo per `round1.md` Q list.
 2. Agent runs demo with developer watching (or developer runs).
 3. For each Q, developer says: PASS / FAIL / NEEDS REWORK.
 4. All Q = PASS → mark task `status: verified` in `tasks.md`.

@@ -12,7 +12,7 @@ Use this when reading developer's quiz answer. Check each axis. ANY hit = additi
 ## Axis 2 — Consistency (일관성)
 
 - task spec NFR (task-local NFR) 와 모순
-- 다른 task 답안 (다른 expected-outputs.md) 와 모순
+- 다른 task 답안 (다른 round1.md) 와 모순
 - problem.md 불변식 (project invariants) 위반
 
 ## Axis 3 — Completeness (완결성)

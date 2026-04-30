@@ -128,7 +128,7 @@ After all steps for a task complete, mark `status: built` in `tasks.md`. Run hum
 
 Each task plan MUST have:
 
-1. **Pre-build gate**: Developer confirms task spec + expected-outputs are signed_off. If not, abort and re-run quiz.
+1. **Pre-build gate**: Developer confirms task spec + round1.md are signed_off. If not, abort and re-run quiz.
 2. **Mid-build checkpoints**: After each step in task, developer has option to inspect (not required, but available).
 3. **Post-build gate**: Run humanpowers:verification-before-completion → developer demo signoff. NO code-pass-only completion.
 
@@ -178,7 +178,7 @@ After saving the per-task plan, run developer confirm gate, then route to humanp
 
 **"Plan complete and saved to `<workspace>/.humanpowers/tasks/{id}/plan.md`.**
 
-**Pre-build gate (REQUIRED):** Developer confirms task spec + expected-outputs are signed_off in `tasks.md`. If not signed_off → abort, re-run humanpowers:quiz for this task.
+**Pre-build gate (REQUIRED):** Developer confirms task spec + round1.md are signed_off in `tasks.md`. If not signed_off → abort, re-run humanpowers:quiz for this task.
 
 **Build path options (after gate passes):**
 

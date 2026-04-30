@@ -19,7 +19,7 @@ digraph when_to_use {
     "Tasks mostly independent?" [shape=diamond];
     "Stay in this session?" [shape=diamond];
     "subagent-driven-development" [shape=box];
-    "executing-plans" [shape=box];
+    "humanpowers:operate --batch" [shape=box];
     "Manual execution or brainstorm first" [shape=box];
 
     "Have implementation plan?" -> "Tasks mostly independent?" [label="yes"];
@@ -128,7 +128,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 ```
 You: I'm using Subagent-Driven Development to execute this plan.
 
-[Read plan file once: ~/humanpowers/{project}/tasks/{task-id}/build-plan.md]
+[Read plan file once: <workspace>/.humanpowers/tasks/{task-id}/plan.md]
 [Extract all 5 tasks with full text and context]
 [Create TodoWrite with all tasks]
 
@@ -282,10 +282,6 @@ In humanpowers, subagents play the role of task lead — ad-hoc per task, no fix
 
 **Dispatch convention**:
 - Pass `task-id` as primary context
-- Subagent reads: `tasks.md#{task-id}`, `tasks/{id}/expected-outputs.md`, `tasks/{id}/build-plan.md`
+- Subagent reads: `tasks.md#{task-id}`, `tasks/{id}/round1.md`, `tasks/{id}/plan.md`
 - Subagent acts within scope of that task only
 - Same human/agent can lead different tasks (no role attachment)
-
-**Memory**:
-- Per-task scratchpad at `library/scratchpads/{task-id}.md` (≤30 lines, auto-truncated by hook)
-- NOT in `~/.claude/projects/.../memory/` (that's claude-code's per-project memory)
