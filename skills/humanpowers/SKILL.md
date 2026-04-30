@@ -12,7 +12,7 @@ Single entry to humanpowers. Two responsibilities:
 1. **Workspace structure** — locate or create `.humanpowers/` and seed `state.json`.
 2. **Phase routing** — read `state.json` and hand off to the next skill.
 
-The dispatcher does not author content. brainstorming owns problem definition; quiz / writing-plans / operate / verification / review own per-task work.
+The dispatcher does not author content. The skill chain is brainstorm → writing-plans → quiz → operate → verification → review → finish. brainstorming owns `problem.md`; writing-plans owns `tasks.md` + `tasks/{id}/plan.md`; quiz owns `tasks/{id}/round1.md`; operate / verification / review own per-task lifecycle.
 
 ## Step 1: Locate workspace
 
@@ -97,9 +97,9 @@ Route:
 | phase | Next skill |
 |-------|-----------|
 | `""` (empty) | humanpowers:brainstorming |
-| `problem-defined` | humanpowers:quiz |
-| `quiz-done` | humanpowers:writing-plans |
-| `planned` | humanpowers:operate (per remaining task; supports `--batch`) |
+| `problem-defined` | humanpowers:writing-plans |
+| `designed` | humanpowers:quiz |
+| `quiz-done` | humanpowers:operate (per remaining task; supports `--batch`) |
 | `built` | humanpowers:verification-before-completion |
 | `verified` (some tasks) | humanpowers:review or humanpowers:operate (next task) |
 | `verified` (all tasks) | humanpowers:finishing-a-development-branch |
