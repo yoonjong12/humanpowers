@@ -44,7 +44,7 @@ project invariant violations (auto-detect): {none | list}
 
 Pull invariant violations by scanning recent commits + tasks.md changes.
 
-### Step 3: AUQ — review options
+### Step 3: AskUserQuestion — review options
 
 ```
 Q: 프로젝트 review 결과. 다음 액션?
@@ -60,7 +60,7 @@ options:
 
 Compute `depends_on` frontier — tasks whose deps are verified.
 
-AUQ:
+AskUserQuestion:
 ```
 Q: 다음 task 후보 (frontier): task-X / task-Y / task-Z. 어디 우선?
 options: [task-X, task-Y, task-Z, parallel-all, custom]
@@ -70,7 +70,7 @@ Hand off: `/humanpowers operate {chosen-task}`.
 
 ### Step 4b: Option 2 — Version bump
 
-AUQ:
+AskUserQuestion:
 ```
 Q: 버전 bump 종류?
 options:
@@ -82,7 +82,7 @@ Edit developer.md frontmatter version. Commit + tag git.
 
 ### Step 4c: Option 3 — Cascade re-quiz
 
-AUQ:
+AskUserQuestion:
 ```
 Q: 어느 task 의 expected-outputs 재검토?
 free text: task-id
@@ -92,7 +92,7 @@ Reset that task's `status: problem-defined`. Hand off to humanpowers:quiz.
 
 ### Step 4d: Option 4 — Threads
 
-List open threads. AUQ per thread:
+List open threads. AskUserQuestion per thread:
 ```
 Q: thread {topic} 상태?
 options: [resolved (close), still open, escalate]
