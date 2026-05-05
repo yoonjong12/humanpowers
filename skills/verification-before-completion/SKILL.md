@@ -8,30 +8,56 @@ description: Use when about to claim work is complete, fixed, or passing, before
 ## Core principle (humanpowers replacement of superpowers verification)
 
 **superpowers**: "All tests pass + types check + linter clean = verified."
-**humanpowers**: "Developer watched the demo + signed off = verified. Code passes are necessary but NOT sufficient."
+**humanpowers**: "Developer heard the debrief, asked their questions, made the calls = verified. Code passes are necessary but NOT sufficient."
 
-VERIFY = signed_off `tasks/{id}/round1.md` from quiz phase.
+VERIFY = developer made each decision in their own words, from their own intent.
+
+## Signoff process (debrief pattern)
+
+**Phase 1 — Automated baseline:**
+Run ai-check. All must pass before debrief. If not, fix first.
+
+**Phase 2 — Debrief:**
+
+Agent opens with a single summary:
+> "X tasks completed as designed: [list]. Y tasks have issues: [list]. Walk through?"
+
+Per issue, agent explains in plain language:
+- What the task was trying to do
+- What actually happened / what deviated
+- Agent's honest read: "simple fix" or "may need redesign"
+
+Agent MUST NOT:
+- Cite round1.md Q IDs or dimension labels to the developer
+- Offer pre-baked options (REWORK / PASS / DEFER)
+- Pre-judge the disposition ("I recommend...")
+- Present analysis grids or deviation tables
+
+Developer drives:
+- Asks follow-up questions based on their original intent
+- Agent provides evidence ONLY when asked (code snippet, test output, diff)
+- Developer makes the call in their own words ("fix it", "leave it", "rethink")
+
+**Phase 3 — Record:**
+
+After each issue is resolved in conversation:
+- Agent records what was decided and what action follows
+- All issues resolved → mark task `status: verified` in `tasks.md`
+- Any fix needed → return to operate; any intent unclear → return to quiz
 
 ## Demo form by action_type
 
-| action_type | Demo form for developer |
-|-------------|-------------------|
-| ui | Live click-through following Gherkin scenarios. Developer watches screen, confirms each Then clause. |
-| api | Live cURL execution with response shown. Developer confirms HTTP code + body shape. |
-| data | SQL query execution with row count + sample row dump. Developer confirms expected vs actual. |
-| infra | Checklist walkthrough + health curl. Developer confirms each item. |
-| cross-cutting | Composite — show all impacted tasks' demos pass. Developer confirms aggregate. |
+Show actual running behavior — not analysis of it.
 
-Developer WATCHES the demo (or operates it themselves). Agent does NOT run demo silently then say "passed". Developer must SEE the result.
+| action_type | What to show |
+|-------------|--------------|
+| ui | Live click-through. Developer watches screen. |
+| api | Live cURL with response. Developer sees HTTP code + body. |
+| data | SQL query with row count + sample row. Developer sees actual vs expected. |
+| infra | Health curl + checklist run. Developer sees each result. |
+| cross-cutting | All impacted tasks' demos run. Developer sees aggregate. |
 
-## Signoff process
-
-1. Agent prepares demo per `round1.md` Q list.
-2. Agent runs demo with developer watching (or developer runs).
-3. For each Q, developer says: PASS / FAIL / NEEDS REWORK.
-4. All Q = PASS → mark task `status: verified` in `tasks.md`.
-5. Any FAIL → halt, return to writing-plans for re-build.
-6. NEEDS REWORK → return to quiz to re-articulate that Q.
+Agent shows. Developer judges. Never reversed.
 
 ## Overview
 
