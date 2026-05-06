@@ -167,19 +167,42 @@ Then: Cleanup worktree (Step 5)
 
 #### Option 2: Push and Create PR
 
+**Step A — Push:**
 ```bash
-# Push branch
 git push -u origin <feature-branch>
+```
 
-# Create PR
-gh pr create --title "<title>" --body "$(cat <<'EOF'
-## Summary
-<2-3 bullets of what changed>
+**Step B — Draft PR body:**
 
-## Test Plan
-- [ ] <verification steps>
-EOF
-)"
+Use the project's PR template. Look for (in order):
+1. `<workspace>/library/prs/TEMPLATE.md` (humanpowers workspace template)
+2. `.github/PULL_REQUEST_TEMPLATE.md` or `.bitbucket/PULL_REQUEST_TEMPLATE.md`
+3. Previous PRs in the repo as reference (`git log --merges --oneline -5`)
+
+Draft the PR body following the template. Present draft to developer:
+```
+Here's the PR draft. Review and let me know if you want changes:
+
+Title: <title>
+Target: <base-branch>
+
+<body following template>
+```
+
+**Step C — Developer confirms:**
+
+Wait for explicit confirmation before creating the PR. Developer may:
+- Approve as-is → create PR
+- Request edits → revise and re-present
+- Abort → keep branch pushed, skip PR
+
+**Step D — Create PR (after confirmation only):**
+```bash
+# Bitbucket
+# Provide URL: https://bitbucket.org/<org>/<repo>/pull-requests/new?source=<branch>&t=1
+
+# GitHub
+gh pr create --title "<title>" --body "<confirmed body>"
 ```
 
 Then: Cleanup worktree (Step 5)
