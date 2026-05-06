@@ -15,7 +15,7 @@ Guide completion of development work by presenting clear options and handling ch
 
 ## ADR digest at finish
 
-humanpowers workspaces are local-only. The decision artifact is the only thing the plugin commits to the repo. At finish time, this skill writes `docs/decisions/<slug>.md` summarizing the design.
+humanpowers workspaces are local-only. At finish time, this skill drafts an ADR summarizing design decisions — but where it lives is the developer's call.
 
 ### Step 1: Confirm all tasks verified
 
@@ -23,7 +23,7 @@ Read `<workspace>/.humanpowers/state.json`. Confirm `tasks_verified == tasks_tot
 
 ### Step 2: Ask the developer for a slug
 
-Ask one question via AskUserQuestion: "What's the slug for this feature?" — short kebab-case identifier (e.g., `pcr-curator-review-injection`). The slug becomes the ADR filename.
+Ask one question: "What's the slug for this feature?" — short kebab-case identifier (e.g., `pcr-curator-review-injection`). The slug becomes the ADR filename.
 
 ### Step 3: Read source artifacts
 
@@ -32,9 +32,9 @@ Read in order:
 - `<workspace>/.humanpowers/tasks.md` (for task list, action_types, depends_on)
 - For each task `{id}`: `<workspace>/.humanpowers/tasks/{id}/round1.md`, `round2.md` if present, `plan.md`, `verify.md`
 
-### Step 4: Write ADR
+### Step 4: Draft ADR
 
-Write to `<target_repo>/docs/decisions/<slug>.md` (create directory if absent):
+Compose the ADR body (do NOT write to disk yet):
 
 ```markdown
 # <feature title from problem.md "What" section>
@@ -72,13 +72,25 @@ Accepted
 <for each task, one line: what was verified and how — test pass, demo signoff, etc.>
 ```
 
-### Step 5: Commit ADR
+### Step 5: Present ADR and ask where to put it
 
-```bash
-cd <target_repo>
-git add docs/decisions/<slug>.md
-git commit -m "design: <feature title>"
+Show the draft to the developer, then ask:
+
 ```
+ADR draft ready. Where should it live?
+
+1. Commit to repo (docs/decisions/<slug>.md)
+2. Keep in workspace only (<workspace>/library/adr-<slug>.md) — not committed
+3. Skip ADR entirely
+```
+
+**Do NOT assume.** Different projects have different conventions. If the repo has no existing `docs/decisions/` directory, that's a signal — ask, don't create.
+
+### Step 6: Write and optionally commit
+
+- **Option 1**: Write to `<target_repo>/docs/decisions/<slug>.md`, create dir if needed, `git add && git commit -m "design: <feature title>"`.
+- **Option 2**: Write to `<workspace>/library/adr-<slug>.md`. No git commit.
+- **Option 3**: Do nothing.
 
 ### Step 6: Optionally bump version + release
 
