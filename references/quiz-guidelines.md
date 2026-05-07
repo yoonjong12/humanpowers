@@ -16,7 +16,7 @@ Dimensions are work-agnostic. They apply to software features, research question
 | **Observable** | What an outside reader sees once the task is done — the artifact, the API shape, the data, the visible signal. |
 | **Acceptance** | The exact condition that means done — pass criterion, threshold, success statistic. |
 | **Constraint** | A quantitative bound (cap, latency, count), a qualitative invariant, or a prohibition. |
-| **Assumption** | What the task takes as given — input definition, prior data state, environmental precondition. |
+| **Assumption** | A verified precondition the task builds on — input shape, data state, environment config. Must be confirmed with evidence before lock; unverified guesses are not assumptions. |
 | **Dependency** | Where inputs come from — another task, an external service, a config value, an upstream artifact. |
 | **Edge** | Empty / null / extreme / out-of-range input handling. |
 | **Failure** | What "wrong" looks like, how it is detected, what the system does when it happens. |
@@ -62,6 +62,12 @@ If the shape is `pick one`, list 3–5 mutually exclusive options and end with `
 ### Rule 4 — Evidence anchor required
 
 Every developer answer carries a source. The source can be a design item ID, a code line (`path/to/file.py:142`), a referenced doc, or `guess (no source)`. A `guess` answer is not invalid, but the agent flags it in the critique log so it gets extra scrutiny.
+
+**Exception — Assumption dimension:** `guess (no source)` is NOT acceptable for Assumption cells. An assumption must be backed by verifiable evidence: a query result, a code read, a doc reference, or a prior lock. If the developer cannot provide evidence, the item is not an assumption — it is an open question and must route back to brainstorming as `open-question-N`. The agent must challenge any assumption cell where the evidence is missing or weak:
+
+> "You stated this as an assumption. What evidence confirms it holds today? (query output, code path, doc link)"
+
+This is especially critical for `action_type: data` and `action_type: infra` tasks where assumptions about data state, schema shape, or service availability are the primary failure mode.
 
 ### Rule 5 — Activation log first, cells second
 

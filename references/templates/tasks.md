@@ -31,9 +31,9 @@ Task-local non-functional requirements. Quantitative bounds (latency, size cap, 
 
 ### Assumptions (`task-1.assumption-N`)
 
-What is taken as given for this task: input shape, prior data state, environment configuration, upstream behavior. If an assumption later proves wrong, the task may need to return to brainstorming.
+Verified preconditions the task builds on. Each assumption must have been confirmed with evidence (query result, code read, doc reference) before writing it here. An unverified guess is NOT an assumption — it belongs in `problem.md` as `open-question-N` until proven.
 
-- task-1.assumption-1: <precondition>
+- task-1.assumption-1: <precondition> — **evidence**: <what confirmed this>
 
 ### Dependencies (`task-1.dependency-N`)
 

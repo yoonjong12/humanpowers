@@ -53,7 +53,7 @@ Rows of the matrix. Fixed.
 | Observable | What an outside reader sees once the task is done. |
 | Acceptance | The condition that means done — pass criterion, threshold. |
 | Constraint | A bound, invariant, or prohibition. |
-| Assumption | What the task takes as given — input, prior state, environment. |
+| Assumption | A verified precondition — confirmed with evidence, assumed to remain true. Unverified = open question, not assumption. |
 | Dependency | Where inputs come from. |
 | Edge | Empty / null / extreme / out-of-range handling. |
 | Failure | What "wrong" looks like, detection, response. |
