@@ -9,30 +9,58 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 Guide completion of development work by presenting clear options and handling chosen workflow.
 
-**Core principle:** Verify tests → Present options → Execute choice → Clean up.
+**Core principle:** Exit gate → ADR → Verify tests → Present options → Execute choice → Clean up → Retrospective.
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
+
+## Exit gate (mandatory first step)
+
+Before anything else, check whether humanpowers exit criteria are met. This is the explicit boundary between "implementation phase" and "finishing phase."
+
+### Read state
+
+```bash
+cat <workspace>/.humanpowers/state.json
+```
+
+### Check criteria
+
+Report to developer:
+
+```
+humanpowers exit criteria:
+  tasks quiz-done:  {tasks_quiz_done}/{tasks_total}  [✓ / ✗]
+  tasks built:      {tasks_built}/{tasks_total}       [✓ / ✗]
+  tasks verified:   {tasks_verified}/{tasks_total}    [✓ / ✗]
+  phase:            {phase}                           [expected: verified]
+```
+
+### Gate logic
+
+- All three counters == `tasks_total` AND phase == `verified` → **PASS**. Proceed to ADR.
+- `tasks_verified < tasks_total` → "task-{id} not verified. Run `humanpowers:verification-before-completion` first." **STOP.**
+- `tasks_built < tasks_total` → "task-{id} not built. Run `humanpowers:operate` first." **STOP.**
+- `tasks_quiz_done < tasks_total` → "task-{id} quiz not done. Run `humanpowers:quiz` first." **STOP.**
+- phase == `aborted` → "Workspace aborted. Cannot finish." **STOP.**
+
+Do NOT proceed past this gate if any criterion fails. The developer must resolve upstream first.
 
 ## ADR digest at finish
 
 humanpowers workspaces are local-only. At finish time, this skill drafts an ADR summarizing design decisions — but where it lives is the developer's call.
 
-### Step 1: Confirm all tasks verified
-
-Read `<workspace>/.humanpowers/state.json`. Confirm `tasks_verified == tasks_total`. If not, error: "Not all tasks verified. Cannot write ADR." and stop.
-
-### Step 2: Ask the developer for a slug
+### Step 1: Ask the developer for a slug
 
 Ask one question: "What's the slug for this feature?" — short kebab-case identifier (e.g., `pcr-curator-review-injection`). The slug becomes the ADR filename.
 
-### Step 3: Read source artifacts
+### Step 2: Read source artifacts
 
 Read in order:
 - `<workspace>/.humanpowers/problem.md` (for problem summary, project invariants)
 - `<workspace>/.humanpowers/tasks.md` (for task list, action_types, depends_on)
 - For each task `{id}`: `<workspace>/.humanpowers/tasks/{id}/round1.md`, `round2.md` if present, `plan.md`, `verify.md`
 
-### Step 4: Draft ADR
+### Step 3: Draft ADR
 
 Compose the ADR body (do NOT write to disk yet):
 
@@ -72,7 +100,7 @@ Accepted
 <for each task, one line: what was verified and how — test pass, demo signoff, etc.>
 ```
 
-### Step 5: Present ADR and ask where to put it
+### Step 4: Present ADR and ask where to put it
 
 Show the draft to the developer, then ask:
 
@@ -86,13 +114,13 @@ ADR draft ready. Where should it live?
 
 **Do NOT assume.** Different projects have different conventions. If the repo has no existing `docs/decisions/` directory, that's a signal — ask, don't create.
 
-### Step 6: Write and optionally commit
+### Step 5: Write and optionally commit
 
 - **Option 1**: Write to `<target_repo>/docs/decisions/<slug>.md`, create dir if needed, `git add && git commit -m "design: <feature title>"`.
 - **Option 2**: Write to `<workspace>/library/adr-<slug>.md`. No git commit.
 - **Option 3**: Do nothing.
 
-### Step 6: Optionally bump version + release
+### Step 6: Optionally bump version + release (unchanged)
 
 If the project uses semver and the developer wants a release, prompt for `major / minor / patch` and run the project's release flow (out of scope for humanpowers; the developer's existing release process applies).
 
@@ -304,11 +332,22 @@ git worktree remove <worktree-path>
 - Get typed confirmation for Option 4
 - Clean up worktree for Options 1 & 4 only
 
+## Retrospective handoff
+
+After the chosen option is executed (merge, PR, keep, or discard) and workspace phase is `finished`:
+
+> "Workflow complete. Next: `humanpowers:retrospective` — review what the framework learned from this project and surface improvements for next time. Run it now or later?"
+
+Do NOT auto-invoke retrospective. Offer it. The developer decides timing.
+
 ## Integration
 
 **Called by:**
 - **subagent-driven-development** (Step 7) — after all tasks complete
 - **operate --batch** — after the final task in the batch is verified
+
+**Hands off to:**
+- **humanpowers:retrospective** — post-project framework improvement (optional, developer-initiated)
 
 **Pairs with:**
 - **using-git-worktrees** — cleans up the worktree created by that skill
