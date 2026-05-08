@@ -54,6 +54,8 @@ Project invariant violations (auto-detect): {none | list}
 
 Pull invariant violations by scanning recent commits and `tasks.md` changes — if a task's behavior or NFR contradicts a project invariant, flag it.
 
+**Test health (cross-task):** Scan `tests/` for duplicate tests across verified tasks — same assertions under different names, parallel test files for the same module, dead test arguments. Report count and locations. See `references/test-architecture-guidelines.md`.
+
 ### Step 3: AskUserQuestion — review options
 
 ```
@@ -61,7 +63,8 @@ Q: Project review summary above. Next action?
 options:
   - 1. Decide next task priority (continue building)
   - 2. Cascade — re-quiz a specific task (reset its status to problem-defined)
-  - 3. Finalize (humanpowers:finishing-a-development-branch)
+  - 3. Test consolidation — address flagged test duplicates
+  - 4. Finalize (humanpowers:finishing-a-development-branch)
 ```
 
 ### Step 4a: Option 1 — Priority decision
@@ -86,7 +89,22 @@ AskUserQuestion:
 
 Reset that task's `status` to `problem-defined` in `tasks.md`. Hand off to humanpowers:quiz.
 
-### Step 4c: Option 3 — Finalize
+### Step 4c: Option 3 — Test consolidation
+
+Present each flagged test duplicate/issue one at a time:
+
+```
+AskUserQuestion:
+  Q: Test issue {n}/{total}: {description}
+     File A: {path}:{test_name}
+     File B: {path}:{test_name}
+     Same behavior tested: {what}
+  options: [Merge into A, Merge into B, Keep both, Delete both]
+```
+
+Execute developer's choice. After all issues resolved, return to Step 3.
+
+### Step 4d: Option 4 — Finalize
 
 Hand off to humanpowers:finishing-a-development-branch.
 

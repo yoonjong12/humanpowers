@@ -83,7 +83,12 @@ Execute task using TDD:
 
 If task references unclear behavior → re-check round1.md. If still unclear → halt and surface the ambiguity to the developer.
 
-After all plan tasks complete: set tasks.md status = `built`. Hand off to verification.
+After all plan steps complete, run post-task test hygiene (see `references/test-architecture-guidelines.md`):
+1. Duplicate scan — does any new test assert the same thing as an existing test?
+2. Dead argument check — does any test pass arguments the function doesn't use?
+3. File placement check — is each new test in the correct owner file?
+
+Fix issues before marking status. Then: set tasks.md status = `built`. Hand off to verification.
 
 ### Step 6: Boundaries
 

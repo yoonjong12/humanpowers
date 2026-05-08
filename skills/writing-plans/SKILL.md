@@ -115,6 +115,19 @@ Each step in `plan.md` is one action (2-5 minutes):
 ---
 ```
 
+## Test design (per-task plan.md)
+
+Before writing TDD steps, check existing tests for the module being modified:
+
+```bash
+grep -r "def test_.*{function_name}" tests/
+```
+
+See `references/test-architecture-guidelines.md` for the full rules. Key points for plan authoring:
+- One behavior = one test = one owner file. Don't create parallel test files for the same module.
+- If an existing test already covers the behavior, extend it (parametrize or add case) instead of writing a duplicate.
+- Plan steps that say "Write the failing test" must specify which test file the test goes in and why (new behavior vs extending existing).
+
 ## Step structure (plan.md)
 
 ````markdown
@@ -186,6 +199,7 @@ bash scripts/get-invariant.sh invariant-N "$WS"
 3. **Placeholder scan:** Search for the patterns above. Fix them.
 4. **Type consistency:** Do types, signatures, and property names used in later tasks match those defined in earlier tasks? `clearLayers()` in task-3 but `clearFullLayers()` in task-7 is a bug.
 5. **TDD discipline:** Does every plan.md step alternate failing-test → implementation → passing-test → commit?
+6. **Test placement:** Does every "write test" step specify the owner file? Are there parallel test files for the same module? See `references/test-architecture-guidelines.md`.
 
 Fix issues inline. No need to re-review — just fix and move on.
 
