@@ -26,7 +26,7 @@ A single task usually activates 5–7 dimensions, sometimes all 9. Trivial confi
 
 ## Decision point sources
 
-The agent identifies decision points by citing existing design items. There are five sources, each with a different trust level. The agent labels each cell with the source:
+The agent identifies decision points by citing existing design items. There are six sources, each with a different trust level. The agent labels each cell with the source:
 
 | Source | Where to look | Trust |
 |--------|---------------|-------|
@@ -34,6 +34,7 @@ The agent identifies decision points by citing existing design items. There are 
 | **design (tasks.md)** | `task-N.observable-N`, `task-N.verify-condition-N`, `task-N.constraint-N`, `task-N.assumption-N`, `task-N.dependency-N` | high — explicit |
 | **prior lock** | a previously locked quiz on a depended-upon task | high — already settled |
 | **code read** | an inspection of existing code that surfaced an unspecified branch | medium — agent interpretation |
+| **personal learnings** | `~/.humanpowers/learnings/quiz.md` — accumulated guidelines from past projects via retrospective | medium — past experience |
 | **agent library** | universal patterns the agent applies (token cap, cache invalidation, deterministic order) | low — agent guess; flag for developer scrutiny |
 
 Cells from low-trust sources should be reviewed first by the developer. If a cell needs a dimension activated but no item supports it, the agent does not invent. It surfaces the gap and routes back to the upstream skill.

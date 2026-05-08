@@ -36,6 +36,7 @@ Load in this order — use scripts to avoid reading full files:
 3. `tasks/{id}/round2.md` — if exists (developer-led answers)
 4. Plan header only: `head -30 tasks/{id}/plan.md` — goal + files touched
 5. Invariants: `bash scripts/get-invariant.sh invariant-N "$WS"` for each relevant invariant
+6. Personal learnings: `~/.humanpowers/learnings/operate.md` — if exists, read as additional context (medium trust)
 
 DO NOT read full tasks.md or full problem.md — use scripts above.
 DO NOT load: other tasks' specs, other tasks' plans (out of scope).

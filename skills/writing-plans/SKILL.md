@@ -22,6 +22,7 @@ The plan assumes the engineer has zero context for the codebase and questionable
 
 - `<workspace>/.humanpowers/problem.md` — read criteria, invariants, out-of-scope, open questions, preliminary task outline.
 - `<workspace>/.humanpowers/state.json` — phase should be `problem-defined`. If not, halt and ask the developer to confirm `problem.md` is signed off.
+- `~/.humanpowers/learnings/writing-plans.md` — if exists, read as medium-trust context for task decomposition and dependency ordering.
 
 ## Outputs
 

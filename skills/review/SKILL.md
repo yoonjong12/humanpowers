@@ -28,6 +28,7 @@ done
 
 Read:
 - `<WS>/.humanpowers/state.json` — phase + task counts
+- `~/.humanpowers/learnings/review.md` — if exists, medium-trust context for cascade decisions
 - `<WS>/.humanpowers/problem.md` — project invariants
 - `<WS>/.humanpowers/tasks.md` — per-task status
 

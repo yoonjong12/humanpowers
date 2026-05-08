@@ -23,6 +23,10 @@ Start by understanding the current project context, then ask questions one at a 
 Do NOT invoke any implementation skill, write any code, or take an implementation action until you have presented `problem.md` and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
+## Personal learnings
+
+Before starting, read `~/.humanpowers/learnings/brainstorming.md` if it exists. Accumulated guidelines from past projects — medium-trust context for problem decomposition and invariant formulation.
+
 ## humanpowers context
 
 When invoked by `humanpowers:humanpowers` (the dispatcher), the workspace `.humanpowers/state.json` exists with `phase = ""`. The brainstorm output is `problem.md`, located at `<workspace>/.humanpowers/problem.md`. Use the template at `references/templates/problem.md`.

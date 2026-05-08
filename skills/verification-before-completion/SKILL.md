@@ -12,6 +12,10 @@ description: Use when about to claim work is complete, fixed, or passing, before
 
 VERIFY = developer made each decision in their own words, from their own intent.
 
+## Personal learnings
+
+Before starting, read `~/.humanpowers/learnings/verification-before-completion.md` if it exists. These are accumulated guidelines from past projects — treat as medium-trust additional context for the debrief.
+
 ## Signoff process (debrief pattern)
 
 **Phase 1 — Automated baseline:**

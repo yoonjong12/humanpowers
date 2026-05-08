@@ -38,6 +38,9 @@ Required upstream artifacts:
 - `<WS>/.humanpowers/tasks.md` — per-task item IDs (observable / verify-condition / constraint / assumption / dependency)
 - `<WS>/.humanpowers/state.json` — phase should be `designed`. If `problem-defined`, route to writing-plans first.
 
+Personal learnings (if exists):
+- `~/.humanpowers/learnings/quiz.md` — accumulated guidelines from past projects. Treat as a 6th decision point source (personal learnings, medium trust). Read before filling the activation log.
+
 Per-task artifacts produced:
 - `tasks/{id}/round1.md` — quiz matrix + Q bodies. Mandatory.
 - `tasks/{id}/round2.md` — optional second pass (developer-led). See round 2 section.
