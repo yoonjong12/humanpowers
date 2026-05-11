@@ -85,6 +85,40 @@ custom serializer 버그는 JSON roundtrip에서만 발현.
 
 `other (write own)` option does not need a `→ Result:` line.
 
+### Rule 10 — Q body frames a decision, not a situation
+
+Each Q body must present a fork — alternatives the developer chooses between. A Q body that dumps code analysis and asks "is this right?" is not a decision point; it is an interview question.
+
+**Self-check before writing a Q body:** Can the developer's answer change the implementation path? If yes → valid decision. If the answer is just "acknowledged" or "confirmed" → not a decision; remove or reframe.
+
+**`yes/no` shape restriction:** Use only for genuine binary decisions (do it / don't do it). If the real question is "which of several approaches," use `pick one`. A `yes/no` that is really "does my analysis sound right?" is banned.
+
+Anti-pattern (banned):
+```
+**Why this decision matters**: rec-N은 wisdom_index에서 None 반환됨.
+N→리스트 인덱스 매칭 전제가 틀리면 잘못된 description이 들어감.
+
+**Expected answer shape**: yes/no
+```
+↑ Situation dump + vague confirmation request. No fork presented.
+
+Correct reframe:
+```
+**Why this decision matters**: rec-N은 wisdom_index에 없어 None → drop.
+소스에 따라 정확도·구현 복잡도 달라짐.
+
+**Expected answer shape**: pick one of [A/B/C/D]
+
+**Options**:
+- A. N을 recommendations 리스트 인덱스로 매칭
+  → Result: 단순. LLM 0/1-based 혼용 시 off-by-one.
+- B. skill_name으로 wisdom_index 재조회
+  → Result: 정확 매칭. wisdom_index에 skill_name 키 필요.
+- C. rec-N ref 폐기 → skill_name 기반 ref 전환
+  → Result: 근본 해결. ref 체계 변경 필요.
+- D. other (write own)
+```
+
 ### Rule 4 — Evidence anchor required
 
 Every developer answer carries a source. The source can be a design item ID, a code line (`path/to/file.py:142`), a referenced doc, or `guess (no source)`. A `guess` answer is not invalid, but the agent flags it in the critique log so it gets extra scrutiny.

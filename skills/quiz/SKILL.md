@@ -105,6 +105,8 @@ For each cell, expand into a Q body in `tasks/{id}/round1.md` using the structur
 
 DO NOT pre-fill the developer's answer. The developer must articulate from blank.
 
+**Self-check per Q body:** Does this present a fork (alternatives with different outcomes)? If the developer's answer would just be "acknowledged" or "yes that's right," it's not a decision — reframe or remove. `yes/no` shape is only for genuine binary decisions, not confirmation requests. See Rule 10 in `references/quiz-guidelines.md`.
+
 ### Step 4: Developer answers
 
 Show the developer the path:
