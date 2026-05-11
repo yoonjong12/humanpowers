@@ -49,13 +49,17 @@ Each cell expands into a Q body. One Q = one decision. The Q heading repeats the
 
 **Cited item**: `<item-id>` (`<problem.md or tasks.md path>`)
 
-<1-2 paragraph context if needed; keep code excerpts ≤ 5 lines, prefer anchors like `path/to/file.py:142`>
+**Why this decision matters**: <1-2 sentences explaining the tradeoff — what changes depending on the choice. Not a restatement of the cited item, but why the developer should care.>
+
+<optional: code excerpt ≤ 5 lines or anchor like `path/to/file.py:142`>
 
 **Expected answer shape**: pick one of [A/B/C] | write number (with unit) | yes/no | free text (≤ N words)
 
 **Options** (if shape is `pick one`):
 - A. <option>
+  → Result: <what changes in behavior/coverage/risk if chosen>
 - B. <option>
+  → Result: <what changes in behavior/coverage/risk if chosen>
 - C. other (write own)
 
 **Developer answer**:

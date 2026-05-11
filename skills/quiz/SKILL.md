@@ -94,9 +94,10 @@ If a dimension is active but no item supports a decision point, do NOT invent. H
 For each cell, expand into a Q body in `tasks/{id}/round1.md` using the structure in `references/templates/quiz-template.md`. Each Q body specifies:
 
 - **Cited item** — the ID being referenced
-- **Context** — 1-2 paragraphs; code excerpts ≤ 5 lines or use anchors like `path/to/file.py:142`
+- **Why this decision matters** — 1-2 sentences on the tradeoff (not a restatement of the cited item)
+- **Context** — optional code excerpts ≤ 5 lines or anchors like `path/to/file.py:142`
 - **Expected answer shape** — one of: `pick one of [A/B/C]` / `write number (with unit)` / `yes/no` / `free text (≤ N words)`
-- **Options** (when shape is `pick one`) — 3-5 mutually exclusive options ending with `other (write own)`
+- **Options** (when shape is `pick one`) — 3-5 mutually exclusive options, each with `→ Result:` showing outcome difference. End with `other (write own)`. See Rule 3b in `references/quiz-guidelines.md`.
 - **Developer answer** — blank for the developer to fill
 - **Source (evidence anchor)** — design item ID / code line / external doc URL / `guess (no source)` (low trust)
 - **Critique log** — agent fills during review

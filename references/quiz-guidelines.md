@@ -60,6 +60,31 @@ Every Q body specifies the shape of the answer the developer is expected to give
 
 If the shape is `pick one`, list 3–5 mutually exclusive options and end with `other (write own)` so the developer is not forced into an artificial set.
 
+### Rule 3b — Consequence-bearing options
+
+Each `pick one` option must include a `→ Result:` line describing what changes in behavior, coverage, or risk if chosen. The developer decides based on outcome differences, not label alone.
+
+The Q body also requires a `**Why this decision matters**` field before the options — a 1-2 sentence explanation of the tradeoff, not a restatement of the cited item.
+
+Bad (label only):
+```
+- A. model_dump/model_validate만 (dict roundtrip)
+- B. 둘 다 (dict + JSON)
+```
+
+Good (consequence visible):
+```
+**Why this decision matters**: dict 직렬화와 JSON 직렬화는 다른 코드 경로를 탄다.
+custom serializer 버그는 JSON roundtrip에서만 발현.
+
+- A. model_dump/model_validate만 (dict roundtrip)
+  → Result: Python 타입 보존 확인. JSON serializer 버그 미검출.
+- B. 둘 다 (dict + JSON)
+  → Result: custom type 변환 오류 조기 발견. 테스트 ~2배.
+```
+
+`other (write own)` option does not need a `→ Result:` line.
+
 ### Rule 4 — Evidence anchor required
 
 Every developer answer carries a source. The source can be a design item ID, a code line (`path/to/file.py:142`), a referenced doc, or `guess (no source)`. A `guess` answer is not invalid, but the agent flags it in the critique log so it gets extra scrutiny.
