@@ -68,10 +68,10 @@ Rows of the matrix. Fixed.
 
 Before filling the activation log, read the existing code to identify decision points (code read source, medium trust). If this research surfaces a conflict between the existing implementation and a task design item, annotate the affected dimension row with `⚠ CONFLICT:` inline — see Rule 9 in `references/quiz-guidelines.md`.
 
-Fill the activation log: which dimensions are active, why, how many decision points each yields. Skipped dimensions get an explicit reason.
+Fill the activation log: which dimensions are active, why, and what fork the developer decides. Skipped dimensions get an explicit reason. Dimensions where agent verification resolved all questions (no fork remains) are marked active but with `Fork: —` and `Qs: 0`.
 
-| Dimension | Active? | Reason | Predicted decision points |
-|-----------|---------|--------|---------------------------|
+| Dimension | Active? | Reason | Fork (what the developer decides) | Qs |
+|-----------|---------|--------|-----------------------------------|-----|
 
 At acknowledgment, the developer must resolve any `⚠ CONFLICT:` annotations (Proceed / Pause / Dismiss) before proceeding to Step 2. If unresolved, do not draft cells.
 
@@ -105,7 +105,13 @@ For each cell, expand into a Q body in `tasks/{id}/round1.md` using the structur
 
 DO NOT pre-fill the developer's answer. The developer must articulate from blank.
 
-**Self-check per Q body:** Does this present a fork (alternatives with different outcomes)? If the developer's answer would just be "acknowledged" or "yes that's right," it's not a decision — reframe or remove. `yes/no` shape is only for genuine binary decisions, not confirmation requests. See Rule 10 in `references/quiz-guidelines.md`.
+**Type gate per Q body (mandatory before writing):** Classify each candidate as Decision, Verification, or Confirmation per Rule 10 in `references/quiz-guidelines.md`.
+
+- **Decision** → write Q body. The fork must match what was named in the activation log.
+- **Verification** → agent resolves it (grep/read/test). Record finding. No Q body.
+- **Confirmation** → not a question. Remove.
+
+`yes/no` shape is only for genuine binary decisions (do it / don't do it), not confirmation requests.
 
 ### Step 4: Developer answers
 

@@ -13,17 +13,17 @@ See `references/quiz-guidelines.md` for the dimension definitions and authoring 
 
 Before drafting cells, the agent records which dimensions are active and why, so the developer can challenge skipped rows.
 
-| Dimension | Active? | Reason | Predicted decision points |
-|-----------|---------|--------|---------------------------|
-| Intent | yes/no | <why> | <count> |
-| Observable | yes/no | <why> | <count> |
-| Acceptance | yes/no | <why> | <count> |
-| Constraint | yes/no | <why> | <count> |
-| Assumption | yes/no | <why> | <count> |
-| Dependency | yes/no | <why> | <count> |
-| Edge | yes/no | <why> | <count> |
-| Failure | yes/no | <why> | <count> |
-| Decision | yes/no | <why> | <count> |
+| Dimension | Active? | Reason | Fork (what the developer decides) | Qs |
+|-----------|---------|--------|-----------------------------------|-----|
+| Intent | yes/no | <why> | <"A vs B: boundary question" or "—" if no fork> | <count> |
+| Observable | yes/no | <why> | <fork> | <count> |
+| Acceptance | yes/no | <why> | <fork> | <count> |
+| Constraint | yes/no | <why> | <fork> | <count> |
+| Assumption | yes/no | <why> | <fork> | <count> |
+| Dependency | yes/no | <why> | <fork> | <count> |
+| Edge | yes/no | <why> | <fork> | <count> |
+| Failure | yes/no | <why> | <fork> | <count> |
+| Decision | yes/no | <why> | <fork> | <count> |
 
 ## Coverage matrix
 

@@ -4,25 +4,51 @@ The agent reads this before drafting any quiz. The developer never sees it. The 
 
 ## What a quiz is for
 
-A quiz narrows the perception gap between the developer (who already has a mental model) and the agent (who is reconstructing it from the design artifacts). Every place the agent could guess is a decision point. The quiz surfaces those points so the developer makes the call explicitly. Once the quiz is locked, the agent is forbidden from guessing on the cited items.
+A quiz narrows the perception gap between the developer (who already has a mental model) and the agent (who is reconstructing it from the design artifacts). The quiz surfaces points where the developer must choose between alternatives and forces them to commit. Once the quiz is locked, the agent is forbidden from guessing on the cited items.
+
+### The core principle
+
+**Facts are the agent's job. Decisions are the developer's job.**
+
+The agent can read code, run grep, check types, trace call sites. Anything the agent can determine by inspecting the codebase is NOT a quiz question — it is the agent's homework.
+
+The quiz exists to extract what the agent CANNOT determine: the developer's judgment on tradeoffs, preferences, risk tolerance, and boundary placement.
+
+### What is a decision
+
+A valid quiz question meets ALL three conditions:
+
+1. **Human judgment required** — the answer involves a tradeoff, preference, or risk tolerance call
+2. **Multiple valid paths exist** — if only one path is correct, it is not a decision
+3. **Cannot be answered by reading code** — if grep/test/read resolves it, the agent should do it, not ask
+
+What is NOT a decision:
+
+| Pattern | Example | Why not | Agent should instead |
+|---------|---------|---------|---------------------|
+| **Verification** | "Is `_find_review` only called from here?" | Deterministic fact | `grep -rn _find_review` |
+| **Confirmation** | "PatternStep에만 추가되는 거 맞지?" | Rubber-stamp request | Read the model definition |
+| **Restatement** | "이 가정이 맞는지?" | Echoing the design doc | Check evidence, then either confirm silently or surface a conflict |
 
 ## The 9 dimensions
 
 Dimensions are work-agnostic. They apply to software features, research questions, data analyses, algorithm designs — any task expressible as a `tasks.md` entry.
 
-| Dimension | What the question elicits |
-|-----------|---------------------------|
-| **Intent** | What this task is trying to produce, and where its boundary stops. |
-| **Observable** | What an outside reader sees once the task is done — the artifact, the API shape, the data, the visible signal. |
-| **Acceptance** | The exact condition that means done — pass criterion, threshold, success statistic. |
-| **Constraint** | A quantitative bound (cap, latency, count), a qualitative invariant, or a prohibition. |
-| **Assumption** | A verified precondition the task builds on — input shape, data state, environment config. Must be confirmed with evidence before lock; unverified guesses are not assumptions. |
-| **Dependency** | Where inputs come from — another task, an external service, a config value, an upstream artifact. |
-| **Edge** | Empty / null / extreme / out-of-range input handling. |
-| **Failure** | What "wrong" looks like, how it is detected, what the system does when it happens. |
-| **Decision** | A point where multiple valid paths exist; the developer must pick one and say why. |
+| Dimension | What the question elicits | Decision looks like | Agent verifies (not quiz) |
+|-----------|---------------------------|---------------------|--------------------------|
+| **Intent** | What this task produces, where its boundary stops. | "Should this also cover X, or is X out of scope?" | Read task spec to confirm stated scope. |
+| **Observable** | What an outside reader sees once done. | "Which format/shape should the output take?" | Check existing code for current output format. |
+| **Acceptance** | The exact condition that means done. | "Where to set the threshold — strict or lenient?" | Run existing tests to see what currently passes. |
+| **Constraint** | A bound, invariant, or prohibition. | "Which bound applies, and what's the tradeoff at the boundary?" | Read config/code for current bounds. |
+| **Assumption** | A verified precondition the task builds on. Must have evidence. | "If this assumption breaks, which fallback?" | Check assumption with evidence (grep, query, code read). Confirmed → not a quiz Q. Unconfirmed → open question, kick back. |
+| **Dependency** | Where inputs come from. | "Which of N ways to satisfy this input?" | Check if dependency exists (import, config, API call). |
+| **Edge** | Empty / null / extreme / out-of-range handling. | "How to handle empty: skip, error, or default?" | Run code with edge inputs to observe current behavior. |
+| **Failure** | What "wrong" looks like, detection, response. | "Fail silently, log, or raise? At what granularity?" | Read existing error handling code. |
+| **Decision** | Multiple valid paths; pick one with rationale. | Always a decision by definition. | N/A. |
 
 A single task usually activates 5–7 dimensions, sometimes all 9. Trivial config changes may activate only Intent and Observable.
+
+**Reading the table:** For each dimension, the agent first does the work in the "Agent verifies" column. If the verification reveals a fork (multiple valid paths), THAT fork becomes a quiz question in the "Decision looks like" form. If verification resolves to a single answer, no quiz question is needed — the agent records the fact and moves on.
 
 ## Decision point sources
 
@@ -44,6 +70,8 @@ Cells from low-trust sources should be reviewed first by the developer. If a cel
 ### Rule 1 — One question, one decision
 
 Each question elicits one decision. If a draft asks "where, how, and how much," split it into three.
+
+A "decision" must satisfy all three conditions from "What is a decision" above. Before writing any Q body, classify: is this a Decision, a Verification, or a Confirmation? Only Decisions become Q bodies. Verifications are the agent's homework. Confirmations are not questions.
 
 ### Rule 2 — Cite item IDs, do not invent
 
@@ -85,39 +113,44 @@ custom serializer 버그는 JSON roundtrip에서만 발현.
 
 `other (write own)` option does not need a `→ Result:` line.
 
-### Rule 10 — Q body frames a decision, not a situation
+### Rule 10 — Type gate before Q body authoring
 
-Each Q body must present a fork — alternatives the developer chooses between. A Q body that dumps code analysis and asks "is this right?" is not a decision point; it is an interview question.
+Before writing each Q body, the agent classifies the candidate:
 
-**Self-check before writing a Q body:** Can the developer's answer change the implementation path? If yes → valid decision. If the answer is just "acknowledged" or "confirmed" → not a decision; remove or reframe.
+| Type | Test | Action |
+|------|------|--------|
+| **Decision** | Human judgment required + multiple valid paths + code can't resolve | → Write Q body |
+| **Verification** | Agent can determine the answer by reading code / running grep / running test | → Agent does it. Record the finding. No Q body. |
+| **Confirmation** | Agent is asking developer to rubber-stamp its analysis | → Not a question. Remove. |
 
-**`yes/no` shape restriction:** Use only for genuine binary decisions (do it / don't do it). If the real question is "which of several approaches," use `pick one`. A `yes/no` that is really "does my analysis sound right?" is banned.
+If a candidate fails the Decision test, it does not become a Q body — even if a dimension is active and an item ID supports it. The dimension stays active (it contributed to the agent's research) but the Q body count drops.
 
-Anti-pattern (banned):
+**`yes/no` shape restriction:** Use only for genuine binary decisions (do it / don't do it). If the real question is "which of several approaches," use `pick one`. A `yes/no` that is really "does my analysis sound right?" is always a Confirmation, never a Decision.
+
+**Example — converting a Verification into a Decision (or dropping it):**
+
+Verification (banned):
 ```
-**Why this decision matters**: rec-N은 wisdom_index에서 None 반환됨.
-N→리스트 인덱스 매칭 전제가 틀리면 잘못된 description이 들어감.
-
+### Q-Assumption.task-3.assumption-1: _find_review 유일 호출자 확인
 **Expected answer shape**: yes/no
 ```
-↑ Situation dump + vague confirmation request. No fork presented.
+↑ Agent can `grep -rn _find_review` to answer this. Not a quiz question.
 
-Correct reframe:
+If the verification reveals a fork, the fork becomes the Q body:
 ```
-**Why this decision matters**: rec-N은 wisdom_index에 없어 None → drop.
-소스에 따라 정확도·구현 복잡도 달라짐.
-
-**Expected answer shape**: pick one of [A/B/C/D]
+### Q-Decision.task-3.assumption-1: _find_review 제거 전략
+**Why this decision matters**: _find_review는 1곳에서만 호출. 
+제거 시 dead code 정리, 유지 시 future-proof.
 
 **Options**:
-- A. N을 recommendations 리스트 인덱스로 매칭
-  → Result: 단순. LLM 0/1-based 혼용 시 off-by-one.
-- B. skill_name으로 wisdom_index 재조회
-  → Result: 정확 매칭. wisdom_index에 skill_name 키 필요.
-- C. rec-N ref 폐기 → skill_name 기반 ref 전환
-  → Result: 근본 해결. ref 체계 변경 필요.
-- D. other (write own)
+- A. 삭제 (YAGNI)
+  → Result: 코드 깔끔. 필요 시 git history 복원.
+- B. 유지
+  → Result: dead code 잔류. linter warning 가능.
+- C. other (write own)
 ```
+
+If verification reveals no fork (single correct path), no Q body needed — the agent records the fact and proceeds.
 
 ### Rule 4 — Evidence anchor required
 
@@ -131,7 +164,9 @@ This is especially critical for `action_type: data` and `action_type: infra` tas
 
 ### Rule 5 — Activation log first, cells second
 
-Before drafting any cell, the agent fills the activation log: which dimensions are active, why, and how many decision points each is expected to yield. The developer can challenge a skipped dimension (e.g., "Edge — really nothing to consider?"). Only after activation is acknowledged does the agent draft cells.
+Before drafting any cell, the agent fills the activation log: which dimensions are active, why, and what fork the developer will decide. The developer can challenge a skipped dimension (e.g., "Edge — really nothing to consider?"). Only after activation is acknowledged does the agent draft cells.
+
+The activation log must articulate the fork, not just a count. "Predicted decision points: 2" without naming the forks is insufficient — the agent commits to asking vague questions later. Name the fork: "A vs B: which source for description data?"
 
 ### Rule 6 — Internal drill axes stay internal
 
