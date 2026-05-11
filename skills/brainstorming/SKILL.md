@@ -201,9 +201,15 @@ After the spec review loop passes, ask the user to review `problem.md` before pr
 
 Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
 
-## Hand off to writing-plans
+## Handoff to writing-plans (follow handoff protocol)
 
-Terminal state of brainstorming: invoke `humanpowers:writing-plans`. Writing-plans reads `problem.md` (criteria + invariants + open questions + preliminary task outline) and produces `tasks.md` with full per-task item IDs. Quiz comes after writing-plans, not before — it cites the IDs that writing-plans assigned.
+Terminal state of brainstorming. Execute the 3-step handoff protocol (see humanpowers dispatcher, Notes for skill authors):
+
+1. `bash scripts/update-state.sh "$WS" phase problem-defined`
+2. Report: "Phase → problem-defined. Invoking humanpowers:writing-plans."
+3. Invoke `humanpowers:writing-plans` via Skill tool **now**.
+
+Writing-plans reads `problem.md` and produces `tasks.md` with full per-task item IDs. Quiz comes after writing-plans, not before.
 
 ## Loop kick-back
 

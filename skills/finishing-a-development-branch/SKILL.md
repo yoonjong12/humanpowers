@@ -336,9 +336,17 @@ git worktree remove <worktree-path>
 
 After the chosen option is executed (merge, PR, keep, or discard) and workspace phase is `finished`:
 
-> "Workflow complete. Next: `humanpowers:retrospective` — review what the framework learned from this project and surface improvements for next time. Run it now or later?"
+1. `bash scripts/update-state.sh "$WS" phase finished`
+2. Offer retrospective (exception to auto-invoke — retrospective is optional):
 
-Do NOT auto-invoke retrospective. Offer it. The developer decides timing.
+```
+AskUserQuestion:
+  Q: Workflow complete. Run retrospective now? (reviews what the framework learned)
+  options: [Yes — run now, Later — I'll invoke manually]
+```
+
+On "Yes" → invoke `humanpowers:retrospective` via Skill tool **now**.
+On "Later" → done. Developer invokes `/humanpowers retrospective` when ready.
 
 ## Integration
 

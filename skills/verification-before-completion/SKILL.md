@@ -46,8 +46,16 @@ Developer drives:
 
 After each issue is resolved in conversation:
 - Agent records what was decided and what action follows
-- All issues resolved → mark task `status: verified` in `tasks.md`
-- Any fix needed → return to operate; any intent unclear → return to quiz
+
+**Handoff (follow handoff protocol in humanpowers dispatcher):**
+
+| Condition | Action |
+|-----------|--------|
+| All issues resolved | 1. Mark task `status: verified` in tasks.md. 2. Check if more unverified tasks remain. If yes → invoke `humanpowers:verification-before-completion` for next task **now**. If all verified → invoke `humanpowers:review` **now**. |
+| Fix needed | Invoke `humanpowers:operate {id}` via Skill tool **now**. |
+| Intent unclear | Invoke `humanpowers:quiz` for that task (kick-back). |
+
+Do NOT summarize and wait after verification. Invoke the next skill immediately.
 
 ## Demo form by action_type
 

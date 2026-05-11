@@ -134,3 +134,32 @@ Skills downstream of the dispatcher must:
 - Read workspace location via upward search from cwd (same logic as Step 1). Do not hard-code a fixed home-relative path.
 - Read `target_repo` from `state.json` when they need the code repo (operate, verification, finishing).
 - Update phase via `scripts/update-state.sh` rather than manual jq edits.
+
+### Handoff protocol
+
+Every skill that transitions to another phase MUST follow this 3-step protocol at its terminal state. No exceptions.
+
+```
+1. UPDATE  — bash scripts/update-state.sh "$WS" phase <new-phase>
+2. REPORT  — one line: "Phase → <new-phase>. Invoking humanpowers:<next-skill>."
+3. INVOKE  — call the next skill via Skill tool immediately.
+             Do NOT summarize and wait. Do NOT ask "what next?".
+             Do NOT say "커밋/PR 필요하면 말해" and stop.
+```
+
+**Exception — developer gate:** If the next phase requires developer action before starting (e.g., developer must edit round1.md), the skill states what's needed, uses AskUserQuestion to confirm readiness, THEN invokes. The skill still invokes — it does not leave the developer to remember which skill comes next.
+
+**Canonical handoff chain:**
+
+| From | Phase set | Invoke |
+|------|-----------|--------|
+| brainstorming | `problem-defined` | `humanpowers:writing-plans` |
+| writing-plans | `designed` | `humanpowers:quiz` |
+| quiz | `quiz-done` | `humanpowers:operate` (or `--batch`) |
+| operate (single) | task status → `built` | `humanpowers:verification-before-completion` for that task |
+| operate (batch) | phase → `built` | `humanpowers:verification-before-completion` for first unverified task |
+| verification | task status → `verified` | `humanpowers:operate` (next task) or `humanpowers:review` (all verified) |
+| review | phase → `reviewed` | `humanpowers:finishing-a-development-branch` |
+| finishing | phase → `finished` | `humanpowers:retrospective` (offer, not force) |
+
+"Hand off" in any skill document means "execute the 3-step protocol." It does not mean "tell the developer about the next skill."

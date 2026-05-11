@@ -106,7 +106,11 @@ Execute developer's choice. After all issues resolved, return to Step 3.
 
 ### Step 4d: Option 4 — Finalize
 
-Hand off to humanpowers:finishing-a-development-branch.
+Execute the 3-step handoff protocol (see humanpowers dispatcher, Notes for skill authors):
+
+1. `bash scripts/update-state.sh "$WS" phase reviewed`
+2. Report: "Phase → reviewed. Invoking humanpowers:finishing-a-development-branch."
+3. Invoke `humanpowers:finishing-a-development-branch` via Skill tool **now**.
 
 ### Step 5: Update state.json
 

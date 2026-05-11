@@ -214,11 +214,15 @@ bash scripts/update-state.sh "$WS" phase designed
 bash scripts/update-state.sh "$WS" tasks_total <count>
 ```
 
-## Hand off to quiz
+## Handoff to quiz (follow handoff protocol)
 
-Terminal state of writing-plans: invoke `humanpowers:quiz`. The quiz reads `tasks.md` and produces a 9-row × N-column matrix per task in `tasks/{id}/round1.md`, citing item IDs from `problem.md` and `tasks.md`. Operate runs only after the relevant tasks' quizzes are locked.
+Terminal state of writing-plans. Execute the 3-step handoff protocol (see humanpowers dispatcher, Notes for skill authors):
 
-> "tasks.md and plan.md files written and committed. Phase = `designed`. Next: `humanpowers:quiz` to populate the per-task quiz matrix and lock expected behavior."
+1. Phase already set to `designed` in Phase transition above.
+2. Report: "Phase → designed. Invoking humanpowers:quiz."
+3. Invoke `humanpowers:quiz` via Skill tool **now**.
+
+The quiz reads `tasks.md` and produces a 9-row × N-column matrix per task in `tasks/{id}/round1.md`. Operate runs only after quizzes are locked.
 
 ## Loop kick-back
 

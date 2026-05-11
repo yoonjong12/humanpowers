@@ -97,14 +97,15 @@ Fix issues before marking status. Then: set tasks.md status = `built`. Hand off 
 - **Don't** invoke quiz module from operate (separate phase)
 - **Don't** auto-promote a constraint to project invariants — flag inline, developer confirms before promotion
 
-### Step 7: Terminal state
+### Step 7: Handoff (mandatory — follow the handoff protocol in humanpowers dispatcher)
 
-After session ends:
-- All plan tasks done → invoke humanpowers:verification-before-completion
-- Some tasks done → hand back to dispatcher (`/humanpowers continue`)
-- Blocked → halt and report the blocker (which task / state) to the developer
+| Condition | Action |
+|-----------|--------|
+| All plan steps done for this task | 1. Set task status → `built` in tasks.md. 2. Report: "Task {id} built. Invoking verification." 3. Invoke `humanpowers:verification-before-completion` via Skill tool **now**. |
+| Some steps done, session ending | 1. Report progress. 2. Invoke `humanpowers:operate {id}` to resume — or tell developer `/humanpowers operate {id}` for next session. |
+| Blocked | Halt. Report the blocker (which task / what's missing). Do NOT proceed to verification. |
 
-Tell developer next step explicitly.
+**Do NOT** summarize and wait. **Do NOT** say "커밋/PR 필요하면 말해" and stop. The handoff protocol requires immediate invocation of the next skill.
 
 ## Batch mode
 
@@ -120,7 +121,7 @@ Behavior in batch mode:
   - Move to the next task only after the current one's tests pass.
 - After all eligible tasks are built, run `scripts/update-state.sh "$WS" tasks_built <count>` and transition the workspace phase to `built`.
 
-Batch mode does not skip the per-task verification gate; verification still runs separately via `humanpowers:verification-before-completion`. Batch mode only fast-paths the build phase.
+Batch mode does not skip the per-task verification gate. After all tasks are built, follow the handoff protocol: update phase → `built`, then invoke `humanpowers:verification-before-completion` for the first unverified task immediately.
 
 Use single-task mode (`/humanpowers operate <id>`) when:
 

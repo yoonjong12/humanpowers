@@ -277,9 +277,22 @@ After all selected tasks reach `quiz-done`:
 bash scripts/update-state.sh "$WS" phase quiz-done
 ```
 
-Hand off to `humanpowers:operate`.
+Execute the 3-step handoff protocol (see humanpowers dispatcher, Notes for skill authors):
 
-> "Quiz phase complete for {N} tasks. Phase = `quiz-done`. Next: `humanpowers:operate` (per task) or `humanpowers:operate --batch` (remaining tasks)."
+1. Phase already set to `quiz-done` above.
+2. Report: "Phase → quiz-done. {N} tasks ready. Invoking humanpowers:operate."
+3. Ask developer which mode, then invoke immediately:
+
+```
+AskUserQuestion:
+  Q: All quizzes locked. How to proceed with operate?
+  options:
+    - Batch (all tasks sequentially)
+    - Single task (pick one)
+```
+
+On Batch → invoke `humanpowers:operate --batch` via Skill tool **now**.
+On Single → ask which task, then invoke `humanpowers:operate {id}` via Skill tool **now**.
 
 ## Boundaries
 
