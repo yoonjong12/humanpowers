@@ -63,7 +63,8 @@ Each cell expands into a Q body. One Q = one decision. The Q heading repeats the
 - C. other (write own)
 
 **Developer answer**:
-<!-- 자유 기술. 한 줄도 OK. 빈 칸 = deferred (agent re-prompts on lock attempt). -->
+<!-- Agent writes here from AUQ response (Step 4B). Developer does NOT edit round1.md directly. -->
+<!-- 빈 칸 = deferred (agent re-prompts on lock attempt). -->
 <!-- PARSER: this line must start with exactly `**Developer answer:**` — parse-answers.sh locates answers by this prefix. Do not change the prefix. -->
 
 **Source (evidence anchor)**:

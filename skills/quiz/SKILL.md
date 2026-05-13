@@ -98,12 +98,12 @@ For each cell, expand into a Q body in `tasks/{id}/round1.md` using the structur
 - **Context** — optional code excerpts ≤ 5 lines or anchors like `path/to/file.py:142`
 - **Expected answer shape** — one of: `pick one of [A/B/C]` / `write number (with unit)` / `yes/no` / `free text (≤ N words)`
 - **Options** (when shape is `pick one`) — 3-5 mutually exclusive options, each with `→ Result:` showing outcome difference. End with `other (write own)`. See Rule 3b in `references/quiz-guidelines.md`.
-- **Developer answer** — blank for the developer to fill
+- **Developer answer** — agent writes from AUQ response (Step 4)
 - **Source (evidence anchor)** — design item ID / code line / external doc URL / `guess (no source)` (low trust)
 - **Critique log** — agent fills during review
 - **Test spec (auto-derived after lock)** — agent fills after lock
 
-DO NOT pre-fill the developer's answer. The developer must articulate from blank.
+DO NOT pre-fill the developer's answer during Q body authoring. The developer answers via AUQ in Step 4; the agent writes the response back to round1.md.
 
 **Type gate per Q body (mandatory before writing):** Classify each candidate as Decision, Verification, or Confirmation per Rule 10 in `references/quiz-guidelines.md`.
 
@@ -113,60 +113,89 @@ DO NOT pre-fill the developer's answer. The developer must articulate from blank
 
 `yes/no` shape is only for genuine binary decisions (do it / don't do it), not confirmation requests.
 
-### Step 4: Developer answers
+### Step 4: Per-Q inline presentation + critique
 
-Show the developer the path:
+Developer does NOT edit round1.md directly. Agent presents each Q inline, developer decides via AUQ, agent writes answer back to round1.md. Critique runs per-Q before moving to next.
 
-```
-Edit <workspace>/.humanpowers/tasks/{id}/round1.md
-Save when done.
-```
+For each Q body (activation log order):
 
-Use AskUserQuestion to wait:
+#### 4A. Chat preamble — co-locate decision context
 
-```
-Q: Have you completed round1.md for task-{id}? options: Done / Skip task / Abort
-```
-
-After developer confirms Done, load answers — do NOT read full round1.md:
-
-```bash
-bash scripts/parse-answers.sh {id} "$WS"
-```
-
-Output: one `===Q-{Dim}.{item-id}` header per answered Q, followed by the full developer answer block.
-
-### Step 5: Per-Q critique loop (one AskUserQuestion at a time)
-
-Use the parse-answers.sh output (loaded in Step 4) to get each Q's answer. Do NOT re-read round1.md. Run a critique pass:
-
-- Is the answer ambiguous (still vague after attempt)?
-- Does it contradict another cell's answer or a cited invariant?
-- Does it leave any active dimension unaddressed?
-- Is the evidence anchor weak (`guess`)?
-
-For each issue found, ask ONE AskUserQuestion. Free text or options as appropriate. Update the answer. Re-evaluate that Q only.
+Show the decision context inline. Developer must have everything needed to decide **in the same screen**.
 
 ```
-critiques = []
-for ambiguity in scan(developer_answer):
-    critiques.append(ambiguity)
+## Q-{Dim}.{cited-item-id}: <one-line decision>
 
-while critiques:
-    critique = critiques.pop(0)  # ONE at a time
-    new_answer = AskUserQuestion(question=critique.question_text, options=critique.options if critique.has_options else None)
-    update_round1_md(developer_answer, Q, new_answer)
-    critiques = [c for c in re_check(...)]
+**Why**: <tradeoff from Q body — what changes depending on choice>
 
-# Q locked when critiques empty
-mark Q as locked in round1.md
+```<language>
+<actual code from the file, NOT an anchor. Read the file, paste the lines.>
+```
 ```
 
-**ANTI-PATTERN (banned)**: Bulk dump multiple critiques in one message ending "What do you think?" This is irresponsible delegation.
+If the Q has no code context (pure design decision), skip the code block. But for any Q that references a code path or existing implementation, **read the file and show the actual lines**.
 
-**REQUIRED**: One AskUserQuestion call per critique. Loop until the critique log is clean for that Q.
+#### 4B. AskUserQuestion — one call per Q
 
-### Step 6: Lock the matrix
+For `pick one` shape:
+
+```
+AskUserQuestion:
+  question: "<decision in plain language>?"
+  header: "<Dim>" (max 12 chars — abbreviate dimension name)
+  options:
+    - label: "A. <option name>"
+      description: "<→ Result: consequence difference>"
+      preview: |
+        <multiline markdown: code/config/test shape this option produces>
+        <what the implementation looks like if chosen>
+    - label: "B. <option name>"
+      description: "<→ Result: consequence difference>"
+      preview: |
+        <what this option produces — concrete diff from A>
+    - label: "C. <option name>"
+      description: "<→ Result: consequence difference>"
+      preview: |
+        <what this option produces>
+```
+
+`preview` = code fences, diffs, config snippets, test outlines. Rendered in sidebar when option focused. This is where the developer sees what each choice **actually produces** — not abstract descriptions.
+
+For `yes/no` shape: 2 options, each with `preview` showing the yes-path vs no-path implementation.
+
+For `free text` / `write number` shape: present as chat question (no AUQ). Developer types answer directly.
+
+#### 4C. Write answer to round1.md
+
+After developer selects:
+1. Write selection to `**Developer answer**:` field in round1.md
+2. Write evidence to `**Source**:` field (cited item + any code line shown in preamble)
+
+#### 4D. Per-Q critique (immediate, before next Q)
+
+Run critique on this Q's answer NOW:
+
+- Ambiguous (vague after attempt)?
+- Contradicts another cell's answer or cited invariant?
+- Leaves active dimension unaddressed?
+- Evidence anchor weak (`guess`)?
+
+If issue found → ONE AskUserQuestion per critique. Loop until critique log clean for this Q. Then move to next Q.
+
+```
+for Q in Qs_in_activation_log_order:
+    show_preamble(Q)           # 4A
+    answer = ask_user(Q)       # 4B
+    write_to_round1(Q, answer) # 4C
+    critique_loop(Q)           # 4D — loop until clean
+    # Q done. Next Q.
+```
+
+**ANTI-PATTERN (banned)**: Bulk dump multiple critiques. One AUQ per critique, one Q at a time.
+
+After all Qs answered + critiqued → proceed to Step 5 (lock).
+
+### Step 5: Lock the matrix
 
 After every active cell has an answer (or `deferred` mark) and every critique log is clean, propose lock:
 
