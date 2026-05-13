@@ -200,6 +200,7 @@ bash scripts/get-invariant.sh invariant-N "$WS"
 4. **Type consistency:** Do types, signatures, and property names used in later tasks match those defined in earlier tasks? `clearLayers()` in task-3 but `clearFullLayers()` in task-7 is a bug.
 5. **TDD discipline:** Does every plan.md step alternate failing-test → implementation → passing-test → commit?
 6. **Test placement:** Does every "write test" step specify the owner file? Are there parallel test files for the same module? See `references/test-architecture-guidelines.md`.
+7. **Convention coverage:** For each file in "Files touched," check project rules (CLAUDE.md, `~/.claude/rules/*.md`) and established codebase patterns (decorators, span naming, error style, import conventions). If a convention applies but no task constraint or observable captures it, append the item ID now.
 
 Fix issues inline. No need to re-review — just fix and move on.
 
